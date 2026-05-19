@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vida de gato - Playable demo</title>
+    <link rel="stylesheet" href="style.css?v=frame-checker-1" />
+  </head>
+  <body>
+    <div id="gameShell" class="game-shell">
+      <div id="gameFrame" class="game-frame">
+        <nav class="language-switch" aria-label="Demo versions">
+          <a href="./index.html">PT</a>
+          <a class="is-active" href="./en.html">EN</a>
+        </nav>
+        <canvas id="gameCanvas" aria-label="Demo jogavel de So Mais Um Miado"></canvas>
+
+        <div id="loading" class="loading" aria-live="polite">
+          <div class="loading-card">
+            <div class="loading-title">So Mais Um Miado</div>
+            <div class="loading-bar"><span></span></div>
+            <div id="loadingText">Carregando assets...</div>
+          </div>
+        </div>
+
+        <main class="hud" aria-label="Interface da demo">
+          <button id="gameUiToggle" class="ui-toggle-button" type="button" aria-label="Alternar interface">UI</button>
+
+          <section class="status-panel">
+            <div class="top-row">
+              <div class="heart-row">
+                <span class="sheet-icon icon-heart" aria-hidden="true"></span>
+                <svg class="pulse-line" viewBox="0 0 170 40" role="img" aria-label="Batimento">
+                  <polyline points="0,22 24,22 32,10 44,32 55,14 66,22 91,22 99,8 113,34 126,16 138,22 170,22" />
+                </svg>
+              </div>
+              <button id="openCinematicButton" class="icon-button" type="button" aria-label="Abrir sequencia cinematografica">ANIMATIC</button>
+              <button id="frameCheckerButton" class="icon-button" type="button" aria-label="Abrir frame checker">FRAME CHECKER</button>
+              <button id="hapticsToggle" class="icon-button" type="button" aria-label="Abrir teste de vibracao">VIBRACAO</button>
+              <button id="fullscreenButton" class="icon-button" type="button" aria-label="Alternar tela cheia">TELA CHEIA</button>
+            </div>
+
+            <div class="status-grid">
+              <div class="status-line">Estado: <strong id="stateLabel">IDLE</strong></div>
+              <div class="status-line">Fase: <strong id="phaseLabel">FILHOTE</strong></div>
+              <div class="status-line">Level: <strong id="levelLabel">01/14</strong></div>
+              <div class="status-line">Controle: <strong id="gamepadLabel">TECLADO/TOQUE</strong></div>
+            </div>
+
+            <div class="level-track" aria-hidden="true">
+              <span id="levelProgress"></span>
+            </div>
+
+            <div class="selector-grid" aria-label="Seletor de fases">
+              <button class="stage-button is-active" data-phase="filhote" type="button">Filhote</button>
+              <button class="stage-button" data-phase="adulto" type="button">Adulto</button>
+              <button class="stage-button" data-phase="idoso" type="button">Idoso</button>
+            </div>
+
+            <div class="needs-row" aria-hidden="true">
+              <span class="sheet-icon need-food"></span>
+              <span class="sheet-icon need-water"></span>
+              <span class="sheet-icon need-care"></span>
+            </div>
+
+            <label class="scene-picker">
+              Cenario
+              <select id="stageSelect" autocomplete="off"></select>
+            </label>
+
+            <label class="scene-picker">
+              Soundtrack
+              <select id="soundtrackSelect" autocomplete="off"></select>
+            </label>
+
+            <div class="instructions">
+              A/D ou setas: mover | Shift: correr | Espaco: pular | J: ataque |
+              S: cair | W: levantar | K: cuidar | L: voz | 1/2/3: fases<br />
+              DualSense: analogico/D-pad move | X pula | Quadrado ataque | Circulo cair |
+              Triangulo levantar | L1 cuidar | R1 miar | R2 correr |
+              D-pad cima/baixo fases | Share/Options levels
+            </div>
+            <div id="warningPanel" class="warning-panel"></div>
+          </section>
+
+          <aside class="debug-panel" aria-label="Debug de Animacao">
+            <h1>Debug de Animacao</h1>
+            <label>
+              Estado
+              <select id="debugState" autocomplete="off"></select>
+            </label>
+            <label>
+              Fase
+              <select id="debugPhase" autocomplete="off"></select>
+            </label>
+            <label>
+              FPS
+              <input id="fpsSlider" type="range" min="1" max="24" value="8" />
+              <span id="fpsValue">8</span>
+            </label>
+            <label>
+              Escala
+              <input id="scaleSlider" type="range" min="0.7" max="2.4" step="0.05" value="1.45" />
+              <span id="scaleValue">1.45</span>
+            </label>
+            <label class="check-row">
+              <input id="gridCheck" type="checkbox" />
+              Mostrar frame bounds
+            </label>
+            <label class="check-row">
+              <input id="pauseCheck" type="checkbox" />
+              Pausar animacao
+            </label>
+            <button id="nextFrame" class="debug-button" type="button">Proximo frame</button>
+          </aside>
+
+          <section id="hapticsPanel" class="haptics-panel is-hidden" aria-label="Tela de teste de vibracao">
+            <div class="haptics-header">
+              <div>
+                <h1>Teste de Vibracao</h1>
+                <p id="hapticsStatus">Conecte um controle ou use mobile com vibracao.</p>
+              </div>
+              <button id="hapticsClose" class="icon-button" type="button" aria-label="Fechar teste de vibracao">FECHAR</button>
+            </div>
+
+            <label class="haptic-strength">
+              Intensidade
+              <input id="hapticsStrength" type="range" min="0.2" max="1" step="0.05" value="0.85" />
+              <span id="hapticsStrengthValue">0.85</span>
+            </label>
+
+            <div class="haptic-grid">
+              <button class="haptic-test-button" data-haptic="jump" type="button">
+                <span>PULO</span>
+                Impulso curto + pouso
+              </button>
+              <button class="haptic-test-button" data-haptic="purr" type="button">
+                <span>RONRONAR</span>
+                Pulsos macios em onda
+              </button>
+              <button class="haptic-test-button" data-haptic="voice" type="button">
+                <span>MIADO</span>
+                Tremor expressivo leve
+              </button>
+              <button class="haptic-test-button" data-haptic="attack" type="button">
+                <span>ATAQUE</span>
+                Corte rapido e seco
+              </button>
+              <button class="haptic-test-button" data-haptic="down" type="button">
+                <span>QUEDA</span>
+                Impacto grave
+              </button>
+              <button class="haptic-test-button" data-haptic="care" type="button">
+                <span>CUIDAR</span>
+                Carinho ritmico
+              </button>
+              <button class="haptic-test-button" data-haptic="up" type="button">
+                <span>LEVANTAR</span>
+                Crescendo de energia
+              </button>
+              <button class="haptic-test-button" data-haptic="phase" type="button">
+                <span>FASE</span>
+                Confirmacao neon
+              </button>
+            </div>
+          </section>
+
+          <section class="joystick-zone" aria-label="Joystick virtual">
+            <div id="joystick" class="joystick">
+              <div id="joystickKnob" class="joystick-knob"></div>
+            </div>
+          </section>
+
+          <nav class="touch-controls" aria-label="Botoes de acao">
+            <button class="neon-button body-button" data-control="body" type="button">
+              <span>Botao A</span>
+              CORPO
+            </button>
+            <button class="neon-button" data-control="voice" type="button">
+              <span>Botao B</span>
+              VOZ
+            </button>
+            <button class="neon-button" data-control="care" type="button">CUIDAR</button>
+            <button class="neon-button" data-control="down" type="button">CAIR</button>
+            <button class="neon-button" data-control="up" type="button">LEVANTAR</button>
+          </nav>
+        </main>
+
+        <section id="cinematicIntro" class="cinematic-intro" aria-label="Animatic dos beats do Ato 1">
+          <canvas id="beatCanvas" class="beat-canvas" aria-label="Player de sprites dos beats"></canvas>
+          <div class="beat-focus-frame" aria-hidden="true"></div>
+
+          <nav class="beat-sequence-menu" aria-label="Menu de sequencias cinematograficas">
+            <div class="beat-brand">
+              <span>Ato 1</span>
+              <strong>Sequencia cinematografica</strong>
+            </div>
+            <select id="beatSequenceSelect" class="visually-hidden" autocomplete="off" aria-label="Beat atual"></select>
+            <label class="beat-soundtrack-control">
+              Soundtrack
+              <select id="beatSoundtrackSelect" autocomplete="off"></select>
+            </label>
+            <label class="beat-toggle-control">
+              <input id="beatDebugToggle" type="checkbox" />
+              Debug
+            </label>
+            <button id="closeCinematic" class="cinematic-mini-button" type="button">JOGAR</button>
+            <div id="beatSequenceList" class="beat-sequence-list" hidden></div>
+          </nav>
+
+          <div id="beatTextBox" class="beat-text-box">
+            <div class="beat-kicker">Beat <span id="beatCounter">1/8</span></div>
+            <h1 id="beatTitle">O abrigo</h1>
+            <h2 id="beatSubtitle">Antes do mundo ser grande demais.</h2>
+            <p id="beatCopy"></p>
+          </div>
+
+          <aside id="beatTechPanel" class="beat-tech-panel is-hidden">
+            <div class="beat-panel-head">
+              <h1>Animatic</h1>
+            </div>
+            <div class="beat-stat">Estado: <strong id="beatPlayState">PLAY</strong></div>
+            <div class="beat-stat">Beat: <strong id="beatIndexLabel">01</strong></div>
+            <div class="beat-stat">Sheet: <strong id="sheetIndexLabel">01/00</strong></div>
+            <div class="beat-stat">Frame: <strong id="frameIndexLabel">00/31</strong></div>
+            <div class="beat-stat">FPS: <strong id="beatFpsLabel">10</strong></div>
+            <div class="beat-stat">Duração: <strong id="beatDurationLabel">0.0s</strong></div>
+            <div class="beat-stat">Frames beat: <strong id="beatTotalFramesLabel">0</strong></div>
+            <div class="beat-stat">Frames seq.: <strong id="sequenceTotalFramesLabel">0</strong></div>
+            <div id="beatWarnings" class="beat-warnings"></div>
+          </aside>
+
+          <div class="beat-controls">
+            <button data-cine="playPause" type="button">Play/Pause</button>
+            <button data-cine="restart" type="button">Restart</button>
+            <button id="cinematicBodyButton" type="button">CORPO</button>
+            <button id="cinematicVoiceButton" type="button">VOZ</button>
+          </div>
+
+          <div id="beatOptionsPanel" class="beat-options is-hidden">
+            <label>FPS <input id="beatFpsSlider" type="range" min="1" max="24" value="10" /></label>
+            <label>Escala <input id="beatScaleSlider" type="range" min="1" max="3" step="0.05" value="1.65" /></label>
+            <label>Fundo
+              <select id="beatBackgroundMode">
+                <option value="dark">Fundo escuro</option>
+                <option value="checker">Fundo checker</option>
+                <option value="transparent">Fundo transparente</option>
+                <option value="white">Fundo branco</option>
+              </select>
+            </label>
+            <label><input id="beatAutoplayToggle" type="checkbox" checked /> Autoplay seq.</label>
+            <label><input id="beatBoundsToggle" type="checkbox" /> Bounds</label>
+            <label><input id="beatGridToggle" type="checkbox" /> Grid info</label>
+            <label><input id="beatRainToggle" type="checkbox" checked /> Chuva</label>
+            <label><input id="beatTextToggle" type="checkbox" checked /> Texto</label>
+            <button data-cine="prevSheet" type="button">Sheet -</button>
+            <button data-cine="nextSheet" type="button">Sheet +</button>
+            <button data-cine="prevFrame" type="button">Frame -</button>
+            <button data-cine="nextFrame" type="button">Frame +</button>
+          </div>
+
+          <div id="beatTimeline" class="beat-timeline" aria-label="Timeline de beats"></div>
+        </section>
+
+        <section id="frameChecker" class="frame-checker is-hidden" aria-label="Frame checker de animacoes">
+          <canvas id="frameCheckerCanvas" class="frame-checker-canvas" aria-label="Visualizador frame a frame"></canvas>
+
+          <header class="frame-checker-topbar">
+            <div>
+              <span>Ferramenta</span>
+              <strong>Frame Checker</strong>
+            </div>
+            <button id="frameCheckerClose" class="cinematic-mini-button" type="button">FECHAR</button>
+          </header>
+
+          <aside class="frame-checker-panel">
+            <label>
+              Fonte
+              <select id="checkerSource">
+                <option value="gameplay">Sprites jogaveis</option>
+                <option value="beats">Beats cinematicos</option>
+              </select>
+            </label>
+
+            <div id="checkerGameplayControls" class="checker-control-group">
+              <label>
+                Fase
+                <select id="checkerPhase"></select>
+              </label>
+              <label>
+                Estado
+                <select id="checkerState"></select>
+              </label>
+            </div>
+
+            <div id="checkerBeatControls" class="checker-control-group is-hidden">
+              <label>
+                Beat
+                <select id="checkerBeat"></select>
+              </label>
+              <label>
+                Sheet
+                <select id="checkerSheet"></select>
+              </label>
+            </div>
+
+            <label>
+              Frame
+              <input id="checkerFrame" type="range" min="0" max="27" value="0" />
+              <span id="checkerFrameLabel">01/28</span>
+            </label>
+
+            <div class="checker-step-row">
+              <button id="checkerPrevFrame" type="button">Frame -</button>
+              <button id="checkerNextFrame" type="button">Frame +</button>
+            </div>
+
+            <label>
+              Escala
+              <input id="checkerScale" type="range" min="0.5" max="4" step="0.05" value="2" />
+              <span id="checkerScaleLabel">2.00</span>
+            </label>
+
+            <label>
+              Alpha anterior
+              <input id="checkerPrevAlpha" type="range" min="0" max="1" step="0.05" value="0.32" />
+              <span id="checkerPrevAlphaLabel">0.32</span>
+            </label>
+
+            <label>
+              Alpha proximo
+              <input id="checkerNextAlpha" type="range" min="0" max="1" step="0.05" value="0.32" />
+              <span id="checkerNextAlphaLabel">0.32</span>
+            </label>
+
+            <label class="check-row">
+              <input id="checkerPrevToggle" type="checkbox" checked />
+              Sobrepor anterior
+            </label>
+            <label class="check-row">
+              <input id="checkerNextToggle" type="checkbox" checked />
+              Sobrepor proximo
+            </label>
+            <label class="check-row">
+              <input id="checkerMaskToggle" type="checkbox" checked />
+              Mascara de alpha
+            </label>
+            <label class="check-row">
+              <input id="checkerGridToggle" type="checkbox" checked />
+              Grid / centro
+            </label>
+            <label class="check-row">
+              <input id="checkerBoundsToggle" type="checkbox" checked />
+              Bounds do frame
+            </label>
+
+            <div id="checkerInfo" class="checker-info">Aguardando assets...</div>
+          </aside>
+        </section>
+      </div>
+    </div>
+
+    <script src="main.js?v=frame-checker-1"></script>
+    <script src="lang-en.js?v=2"></script>
+  </body>
+</html>

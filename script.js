@@ -12,6 +12,43 @@ const projects = [
     year: "Work in progress",
     hero: "./assets/cat-wip/vida-de-gato-adulto-corrida.webp",
     video: "./assets/cat-wip/vida-de-gato-wip-loop.mp4",
+    liveUrl: "./vida-de-gato-demo/",
+    liveUrlEn: "./vida-de-gato-demo/en.html",
+    codeUrl: "https://github.com/VinisiusZen/labcomarts-portfolio/tree/main/vida-de-gato-demo",
+    tags: [
+      "AI-generated animation sprites",
+      "AI-assisted playable demo",
+      "Creative Technologist",
+      "HTML5 Canvas game prototype",
+      "AI soundtrack generation",
+      "Generated level design",
+      "Sprite pipeline",
+      "Game feel prototyping",
+      "GenAI production workflow",
+      "AI Creative Direction"
+    ],
+    soundtracks: [
+      {
+        label: "Fase 3 - O Limiar (Take 1)",
+        src: "./vida-de-gato-demo/assets/audio/soundtracks/Fase 3_ O Limiar (Take 1).mp3"
+      },
+      {
+        label: "Fase 3 - O Limiar (Take 2)",
+        src: "./vida-de-gato-demo/assets/audio/soundtracks/Fase 3_ O Limiar (Take 2).mp3"
+      },
+      {
+        label: "Fase 4 - A Disparada (Take 1)",
+        src: "./vida-de-gato-demo/assets/audio/soundtracks/Fase 4_ A Disparada (Take 1).mp3"
+      },
+      {
+        label: "Fase 4 - A Disparada (Take 2)",
+        src: "./vida-de-gato-demo/assets/audio/soundtracks/Fase 4_ A Disparada (Take 2).mp3"
+      }
+    ],
+    levelGallery: Array.from(
+      { length: 14 },
+      (_, index) => `./assets/cat-wip/levels/stage_${String(index + 1).padStart(2, "0")}.webp`
+    ),
     customGallery: [
       "./assets/cat-wip/vida-de-gato-filhote-abrigo.webp",
       "./assets/cat-wip/vida-de-gato-filhote-salto.webp",
@@ -342,7 +379,7 @@ function updateProgress() {
 
 function setupReveal() {
   const targets = document.querySelectorAll(
-    ".section-head, .work-card, .profile-band, .services-strip article, .ai-lab, .contact, .project-aside, .project-hero, .detail-grid, .gallery figure, .next-project"
+    ".section-head, .work-card, .profile-band, .services-strip article, .ai-lab, .contact, .project-aside, .project-hero, .detail-grid, .process-module, .gallery figure, .next-project"
   );
   targets.forEach((item) => item.classList.add("reveal"));
 
@@ -414,6 +451,22 @@ function renderDetail() {
           <div><dt>Tools</dt><dd>${project.tools}</dd></div>
           <div><dt>Year</dt><dd>${project.year}</dd></div>
         </dl>
+        ${
+          project.liveUrl || project.codeUrl
+            ? `<div class="project-actions">
+                ${project.liveUrl ? `<a class="button" href="${project.liveUrl}">Testar online</a>` : ""}
+                ${project.liveUrlEn ? `<a class="button secondary-button" href="${project.liveUrlEn}">English version</a>` : ""}
+                ${project.codeUrl ? `<a class="button secondary-button" href="${project.codeUrl}">Codigo</a>` : ""}
+              </div>`
+            : ""
+        }
+        ${
+          project.tags
+            ? `<div class="tag-cloud" aria-label="Tags de posicionamento">
+                ${project.tags.map((tag) => `<span>${tag}</span>`).join("")}
+              </div>`
+            : ""
+        }
       </aside>
 
       <section class="project-main">
@@ -445,6 +498,29 @@ function renderDetail() {
           </aside>
         </div>
 
+        ${
+          project.soundtracks
+            ? `<section class="process-module">
+                <div>
+                  <p class="eyebrow">AI soundtrack generation</p>
+                  <h2>Player com trilhas geradas para o demo.</h2>
+                </div>
+                <div class="audio-grid">
+                  ${project.soundtracks
+                    .map(
+                      (track) => `
+                        <article>
+                          <strong>${track.label}</strong>
+                          <audio controls preload="none" src="${track.src}"></audio>
+                        </article>
+                      `
+                    )
+                    .join("")}
+                </div>
+              </section>`
+            : ""
+        }
+
         <div class="gallery" aria-label="Galeria de slides do projeto">
           ${gallery
             .map(
@@ -457,6 +533,29 @@ function renderDetail() {
             )
             .join("")}
         </div>
+
+        ${
+          project.levelGallery
+            ? `<section class="process-module">
+                <div>
+                  <p class="eyebrow">Generated level design</p>
+                  <h2>Galeria de levels gerados para testar atmosfera, progressao e ritmo visual.</h2>
+                </div>
+                <div class="gallery level-gallery" aria-label="Galeria de levels gerados">
+                  ${project.levelGallery
+                    .map(
+                      (image, imageIndex) => `
+                        <figure>
+                          <img src="${image}" alt="Vida de gato - level gerado ${imageIndex + 1}" />
+                          <figcaption>Level ${String(imageIndex + 1).padStart(2, "0")}</figcaption>
+                        </figure>
+                      `
+                    )
+                    .join("")}
+                </div>
+              </section>`
+            : ""
+        }
 
         <a class="next-project" href="${projectUrl(next)}">
           <div>

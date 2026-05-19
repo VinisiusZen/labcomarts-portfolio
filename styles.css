@@ -214,6 +214,10 @@ h1 mark {
   content: "→";
 }
 
+.secondary-button {
+  color: var(--ink);
+}
+
 .hero-focus {
   grid-area: focus;
   align-self: end;
@@ -517,6 +521,30 @@ h1 mark {
   overflow-wrap: anywhere;
 }
 
+.project-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 26px 0;
+}
+
+.tag-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 26px;
+}
+
+.tag-cloud span {
+  border: 1px solid var(--line);
+  padding: 7px 9px;
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 780;
+  text-transform: uppercase;
+}
+
 .project-main {
   min-width: 0;
   max-width: 100%;
@@ -617,6 +645,51 @@ h1 mark {
   color: var(--soft);
   font-size: 0.74rem;
   text-transform: uppercase;
+}
+
+.process-module {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.36fr) minmax(0, 1fr);
+  gap: clamp(22px, 4vw, 46px);
+  margin-top: 48px;
+  padding-top: 34px;
+  border-top: 1px solid var(--line);
+}
+
+.process-module h2 {
+  margin: 0;
+  font-size: clamp(1.45rem, 3vw, 2.6rem);
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+
+.audio-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.audio-grid article {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.36fr) minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  padding: 14px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+}
+
+.audio-grid strong {
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+}
+
+.audio-grid audio {
+  width: 100%;
+}
+
+.level-gallery {
+  margin-top: 0;
 }
 
 .next-project {
@@ -726,6 +799,8 @@ h1 mark {
   .section-head,
   .detail-copy,
   .gallery,
+  .process-module,
+  .audio-grid article,
   .services-strip,
   .thumb-rail {
     grid-template-columns: 1fr;
