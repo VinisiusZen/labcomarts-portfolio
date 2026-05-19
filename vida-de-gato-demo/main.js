@@ -2807,6 +2807,9 @@ function stopBeatAmbience() {
 }
 
 function triggerCue(cueName) {
+  if (!cueName) return;
+  // Public portfolio build: cinematic cue placeholders are intentionally muted until final SFX exports exist.
+  return;
   const audio = new Audio(`assets/audio/${cueName}.mp3`);
   audio.volume = 0.28;
   audio.play().catch(() => {});
