@@ -3,6 +3,39 @@ const thumb = (number) => `./assets/work/thumbs/slide-${String(number).padStart(
 
 const projects = [
   {
+    id: "vida-de-gato-wip",
+    number: "WIP",
+    title: "Vida de gato",
+    category: "Playable demo / game prototype",
+    role: "Direção criativa, game feel, sprites e animatic",
+    tools: "HTML5 Canvas, JavaScript, sprite sheets e GenAI",
+    year: "Work in progress",
+    hero: "./assets/cat-wip/vida-de-gato-adulto-corrida.webp",
+    video: "./assets/cat-wip/vida-de-gato-wip-loop.mp4",
+    customGallery: [
+      "./assets/cat-wip/vida-de-gato-filhote-abrigo.webp",
+      "./assets/cat-wip/vida-de-gato-filhote-salto.webp",
+      "./assets/cat-wip/vida-de-gato-adulto-corrida.webp",
+      "./assets/cat-wip/vida-de-gato-adulto-ataque.webp",
+      "./assets/cat-wip/vida-de-gato-idoso-respiro.webp",
+      "./assets/cat-wip/vida-de-gato-idoso-queda.webp",
+      "./assets/cat-wip/vida-de-gato-animatic-ui.webp"
+    ],
+    summary:
+      "Work in progress de um demo jogável sobre a vida de um gato, com sprites, fases de vida, cenários urbanos e animatic.",
+    challenge:
+      "Transformar uma ideia emocional em um protótipo jogável com leitura imediata: o gato precisa parecer vivo, vulnerável e responsivo, sem depender de uma produção completa de game ainda.",
+    solution:
+      "O protótipo usa HTML5 Canvas, sprites por fase de vida, estados de animação, cenários em progressão, tela de animatic, frame checker, controles por teclado/toque e testes de vibração para investigar game feel.",
+    highlights: [
+      "Demo jogável em Canvas com fases filhote, adulto e idoso.",
+      "Sprites com estados de idle, run, jump, attack, down, getting up e grooming.",
+      "Animatic do Ato 1 para amarrar narrativa, ritmo e atmosfera.",
+      "Frame checker interno para revisar bounds, alpha e continuidade dos sprites.",
+      "Loop de gameplay capturado como material de WIP para portfolio."
+    ]
+  },
+  {
     id: "cinema-mask-action",
     number: "01",
     title: "Uma ação para cinema",
@@ -385,7 +418,11 @@ function renderDetail() {
 
       <section class="project-main">
         <div class="project-hero">
-          <img src="${project.hero}" alt="${project.title}" />
+          ${
+            project.video
+              ? `<video src="${project.video}" poster="${project.hero}" autoplay muted loop playsinline controls aria-label="${project.title}"></video>`
+              : `<img src="${project.hero}" alt="${project.title}" />`
+          }
         </div>
         <div class="thumb-rail" aria-label="Preview do projeto">
           ${rail.map((image) => `<img src="${image}" alt="" />`).join("")}

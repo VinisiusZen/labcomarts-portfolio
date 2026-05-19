@@ -42,7 +42,8 @@ a {
   text-decoration: none;
 }
 
-img {
+img,
+video {
   display: block;
   max-width: 100%;
 }
@@ -529,7 +530,8 @@ h1 mark {
   box-shadow: var(--shadow);
 }
 
-.project-hero img {
+.project-hero img,
+.project-hero video {
   width: 100%;
   aspect-ratio: 16 / 9;
   object-fit: cover;
@@ -712,6 +714,8 @@ h1 mark {
 
   .project-summary,
   .meta-list dd {
+    width: 100%;
+    max-width: calc(100vw - 36px);
     overflow-wrap: anywhere;
   }
 
@@ -751,6 +755,16 @@ h1 mark {
 
   .next-project {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .project-aside,
+  .project-summary,
+  .meta-list,
+  .meta-list dd {
+    width: min(100%, 354px);
+    max-width: 354px;
   }
 }
 
