@@ -1,267 +1,128 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#10110f" />
-    <title>Vinicius Zen - Creative Direction + AI Workflows</title>
+    <meta name="theme-color" content="#070807" />
+    <title>Vinisius Zen - Creative Direction Portfolio</title>
     <meta
       name="description"
-      content="Remote creative portfolio for Vinicius Zen: creative direction, AI-assisted workflows, Creative Ops, motion, 3D and brand systems."
+      content="Portfolio de Vinisius Zen: direcao criativa, campanhas, visual aids, 3D, branding, eventos e sistemas visuais."
     />
-    <link rel="icon" href="./assets/zumbi/images/zumbi-standing.png" />
+    <link rel="icon" href="./assets/work/slides/slide-011.webp" />
     <link rel="stylesheet" href="./styles.css" />
   </head>
-  <body>
+  <body data-page="home">
     <div class="progress" aria-hidden="true"></div>
 
     <header class="topbar">
-      <a class="brand" href="#top" aria-label="Vinicius Zen portfolio home">
-        <span>Vinicius Zen</span>
+      <a class="brand" href="./index.html" aria-label="Voltar para a home">
+        <span>Vinisius Zen</span>
+        <small>Creative Direction</small>
       </a>
-      <nav class="nav" aria-label="Portfolio sections">
-        <a href="#cases">Cases</a>
-        <a href="#fit">Role fit</a>
-        <a href="#system">System</a>
+      <nav class="nav" aria-label="Secoes do portfolio">
+        <a href="#work">Work</a>
+        <a href="#about">About</a>
+        <a href="#services">Services</a>
+        <a href="#ai-lab">AI Lab</a>
         <a href="#contact">Contact</a>
       </nav>
+      <div class="location" aria-label="Localizacao e horario">
+        <span>Sao Paulo, BR</span>
+        <strong data-clock>10:36 AM</strong>
+      </div>
     </header>
 
-    <main id="top">
-      <section class="hero" aria-label="Portfolio introduction">
-        <video
-          class="hero-video"
-          src="./assets/zumbi/video/slow-zoom-out.mp4"
-          poster="./assets/zumbi/images/moon-riverbank.png"
-          autoplay
-          muted
-          loop
-          playsinline
-        ></video>
-        <div class="hero-scrim" aria-hidden="true"></div>
-        <div class="hero-inner">
-          <p class="eyebrow">Remote creative direction - PT/EN</p>
-          <h1>Creative direction for AI-assisted production systems.</h1>
-          <p class="hero-copy">
-            I help teams turn briefs into visual concepts, production pipelines and polished
-            creative outputs across video, motion, brand systems and high-volume creative ops.
-          </p>
-          <div class="hero-actions" aria-label="Primary portfolio actions">
-            <a class="button primary" href="#cases">View cases</a>
-            <a class="button secondary" href="#contact">Recruiter summary</a>
-          </div>
-        </div>
-      </section>
-
-      <section class="signal-band" aria-label="Professional focus">
-        <div class="signal-grid">
-          <article>
-            <span>18+ years</span>
-            <p>Creative leadership in agencies, brand projects and production workflows.</p>
-          </article>
-          <article>
-            <span>AI workflows</span>
-            <p>GenAI used for exploration, prototyping, refinement and production speed.</p>
-          </article>
-          <article>
-            <span>Creative Ops</span>
-            <p>Briefing, prioritization, review systems, quality control and repeatable delivery.</p>
-          </article>
-          <article>
-            <span>Remote-ready</span>
-            <p>Clear artifacts, async rationale, English communication and stakeholder alignment.</p>
-          </article>
-        </div>
-      </section>
-
-      <section class="intro section-pad">
-        <div class="section-heading">
-          <p class="eyebrow">Positioning</p>
-          <h2>Not just "AI images." Direction, workflow and final craft.</h2>
-        </div>
-        <div class="intro-copy">
+    <main>
+      <section class="home-hero" id="top" aria-label="Introducao">
+        <div class="hero-copy-block">
+          <p class="eyebrow">Creative Director</p>
+          <h1>Ideas <mark>that move</mark> brands.</h1>
           <p>
-            My strongest fit is the overlap between creative direction, AI-assisted storytelling,
-            motion/video production and Creative Ops. The cases below are built to show the
-            thinking behind the work: brief, concept, pipeline, iterations, direction and result.
+            Direcao criativa, storytelling visual e sistemas de producao para campanhas,
+            experiencias, conteudo medico, 3D e fluxos com IA.
           </p>
-          <p>
-            The goal is simple: help remote teams move faster without losing narrative, brand
-            consistency, visual quality or decision clarity.
-          </p>
+          <a class="text-link" href="#work">View selected work <span aria-hidden="true">→</span></a>
         </div>
+
+        <div class="hero-focus" aria-label="Projeto em destaque">
+          <img src="./assets/work/slides/slide-011.webp" alt="Acao para cinema com publico usando mascaras" />
+          <div>
+            <span>01 / Cinema activation</span>
+            <strong>Uma acao para cinema</strong>
+          </div>
+        </div>
+
+        <ul class="hero-index" aria-label="Areas de atuacao">
+          <li><span>01</span> Campanhas</li>
+          <li><span>02</span> Experiencias</li>
+          <li><span>03</span> Visual aids</li>
+          <li><span>04</span> 3D + motion</li>
+          <li><span>05</span> AI workflows</li>
+        </ul>
       </section>
 
-      <section class="cases section-pad" id="cases">
-        <div class="section-heading wide">
-          <p class="eyebrow">Selected case narratives</p>
-          <h2>Two proof-of-work cases for remote creative roles.</h2>
+      <section class="selected-work" id="work" aria-label="Projetos selecionados">
+        <div class="section-head">
+          <p class="eyebrow">Selected work</p>
+          <h2>Projetos em formato banner. Clique para abrir o detalhe.</h2>
         </div>
+        <div class="work-grid" data-project-grid></div>
+      </section>
 
-        <article class="case feature-case" id="case-ai">
-          <div class="case-media cinematic-media">
-            <img class="scene scene-river" src="./assets/zumbi/images/moon-riverbank.png" alt="" />
-            <img class="scene scene-guardian" src="./assets/zumbi/images/ritual-guardian.png" alt="" />
-            <img class="scene scene-zumbi" src="./assets/zumbi/images/zumbi-standing.png" alt="Cinematic character composition from an original IP prototype" />
-          </div>
-          <div class="case-copy">
-            <p class="case-kicker">Case 01 - AI-assisted cinematic storytelling</p>
-            <h3>From original IP concept to immersive narrative prototype.</h3>
-            <p>
-              A cinematic web prototype that turns early worldbuilding into a tangible creative
-              artifact: scene structure, visual direction, motion, audio atmosphere and interactive
-              delivery.
-            </p>
-            <dl class="case-facts">
-              <div>
-                <dt>Brief</dt>
-                <dd>Communicate mood, conflict and character without relying on a long pitch deck.</dd>
-              </div>
-              <div>
-                <dt>Concept</dt>
-                <dd>A chapter-based prequel experience with scroll-driven cinematic progression.</dd>
-              </div>
-              <div>
-                <dt>Pipeline</dt>
-                <dd>Worldbuilding, scene list, visual system, motion prototype, review and refinement.</dd>
-              </div>
-              <div>
-                <dt>Result</dt>
-                <dd>A remote-friendly artifact for pitch alignment, branded experiences and AI video workflows.</dd>
-              </div>
-            </dl>
-          </div>
+      <section class="profile-band" id="about">
+        <div>
+          <p class="eyebrow">About</p>
+          <h2>Direcao que conecta conceito, execucao e contexto de negocio.</h2>
+        </div>
+        <p>
+          O portfolio reune acoes promocionais, estudos criativos, materiais de produto,
+          campanhas motivacionais, visual aids e experimentos de 3D/IA. A leitura foi organizada
+          para mostrar pensamento, aplicacao e variedade sem virar um deposito de slides.
+        </p>
+      </section>
+
+      <section class="services-strip" id="services" aria-label="Servicos">
+        <article>
+          <span>01</span>
+          <h3>Creative Direction</h3>
+          <p>Conceito, narrativa, visual key, apresentacao e criterio de decisao.</p>
         </article>
-
-        <article class="case product-case" id="case-ops">
-          <div class="case-copy">
-            <p class="case-kicker">Case 02 - Creative Ops product prototype</p>
-            <h3>From ambiguous visual request to focused parallax composition.</h3>
-            <p>
-              A product-layer prototype that reframed the assignment from "landing page" to
-              "interactive product composition," using criteria, direction tests, asset treatment
-              and a documented scorecard.
-            </p>
-            <dl class="case-facts">
-              <div>
-                <dt>Brief</dt>
-                <dd>Use supplied static PNG layers and ingredient callouts as the core visual event.</dd>
-              </div>
-              <div>
-                <dt>Concept</dt>
-                <dd>A dark parallax stage with product first, interface second and controlled motion.</dd>
-              </div>
-              <div>
-                <dt>Iterations</dt>
-                <dd>Three directions compared: corrected landing, editorial exploded view and dark stage.</dd>
-              </div>
-              <div>
-                <dt>Result</dt>
-                <dd>A clearer creative decision system for remote review and high-volume production.</dd>
-              </div>
-            </dl>
-          </div>
-          <div class="case-media icecream-stage" aria-label="Layered parallax product composition">
-            <img class="ice layer-pistache" src="./assets/sorvete/layers/Layer__0000s_0004_pistache.png" alt="" />
-            <img class="ice layer-morango" src="./assets/sorvete/layers/Layer__0000s_0003_morango.png" alt="" />
-            <img class="ice layer-creme" src="./assets/sorvete/layers/Layer__0000s_0002_creme.png" alt="" />
-            <img class="ice layer-chantilly" src="./assets/sorvete/layers/Layer__0000s_0001_chantily.png" alt="" />
-            <img class="ice layer-cereja" src="./assets/sorvete/layers/Layer__0000s_0000_cereja.png" alt="Layered ice cream product composition" />
-            <img class="callout callout-a" src="./assets/sorvete/dizeres/pistache_tostado_e_salgado.png" alt="" />
-            <img class="callout callout-b" src="./assets/sorvete/dizeres/pedacos_de_morango.png" alt="" />
-            <img class="callout callout-c" src="./assets/sorvete/dizeres/muito_chantilly.png" alt="" />
-          </div>
+        <article>
+          <span>02</span>
+          <h3>Campaign Systems</h3>
+          <p>Desdobramentos para incentivo, trade, medico, social e ponto de contato fisico.</p>
+        </article>
+        <article>
+          <span>03</span>
+          <h3>AI Lab</h3>
+          <p>Exploracao visual, prototipos, mood, iteracoes e simulacao de experiencias.</p>
+        </article>
+        <article>
+          <span>04</span>
+          <h3>Visual Craft</h3>
+          <p>Design, composicao, 3D, apresentacoes, ajudas visuais e materiais de marca.</p>
         </article>
       </section>
 
-      <section class="fit section-pad" id="fit">
-        <div class="section-heading">
-          <p class="eyebrow">Role fit</p>
-          <h2>Best match for remote creative opportunities.</h2>
-        </div>
-        <div class="fit-board">
-          <article class="fit-card is-strong">
-            <div class="fit-score">86</div>
-            <h3>AI Video Creative Director</h3>
-            <p>Best match. Combines AI, storytelling, video craft, creative leadership and remote collaboration.</p>
-            <span>Superside-style target</span>
-          </article>
-          <article class="fit-card">
-            <div class="fit-score">80</div>
-            <h3>Art Direction + Creative Strategy</h3>
-            <p>Strong fit for branding, campaigns, presentations, entertainment and strategic visual systems.</p>
-            <span>Jobgether-style target</span>
-          </article>
-          <article class="fit-card">
-            <div class="fit-score">72</div>
-            <h3>AI Narrative Video Director</h3>
-            <p>Good fit if positioned around short-form storytelling, vertical video and hands-on AI production.</p>
-            <span>EverAI-style target</span>
-          </article>
-        </div>
-      </section>
-
-      <section class="system section-pad" id="system">
-        <div class="section-heading wide">
-          <p class="eyebrow">Operating system</p>
-          <h2>The repeatable workflow behind the work.</h2>
-        </div>
-        <ol class="pipeline" aria-label="Creative workflow pipeline">
-          <li>
-            <span>01</span>
-            <h3>Brief diagnosis</h3>
-            <p>Clarify the real creative problem before producing outputs.</p>
-          </li>
-          <li>
-            <span>02</span>
-            <h3>Concept system</h3>
-            <p>Define tone, audience, visual logic, narrative role and success criteria.</p>
-          </li>
-          <li>
-            <span>03</span>
-            <h3>AI-assisted exploration</h3>
-            <p>Use GenAI to expand options while keeping direction, brand logic and quality control.</p>
-          </li>
-          <li>
-            <span>04</span>
-            <h3>Iteration and review</h3>
-            <p>Compare directions with criteria, not taste alone, and document why decisions win.</p>
-          </li>
-          <li>
-            <span>05</span>
-            <h3>Production delivery</h3>
-            <p>Turn the direction into assets, prototypes, decks, video systems or campaign formats.</p>
-          </li>
-        </ol>
-      </section>
-
-      <section class="evidence section-pad">
-        <div class="section-heading">
-          <p class="eyebrow">Evidence to add next</p>
-          <h2>What will make the portfolio application-ready.</h2>
-        </div>
-        <div class="evidence-list">
-          <p>45-60s screen recording of the cinematic prototype.</p>
-          <p>20-30s screen recording of the parallax product prototype.</p>
-          <p>Contact sheets for both cases with before, iterations and final direction.</p>
-          <p>Real metrics: timeline, number of iterations, assets produced, team size and review cycles.</p>
-        </div>
-      </section>
-
-      <section class="contact section-pad" id="contact">
-        <div class="contact-panel">
-          <p class="eyebrow">Recruiter-ready summary</p>
-          <h2>Creative Director focused on AI-assisted workflows, Creative Ops and scalable production.</h2>
+      <section class="ai-lab" id="ai-lab">
+        <img src="./assets/work/slides/slide-001.webp" alt="Ambiente futurista de pesquisa visual" />
+        <div>
+          <p class="eyebrow">AI Lab</p>
+          <h2>IA como prototipagem de direcao, nao como atalho de acabamento.</h2>
           <p>
-            I bring 18+ years in creative leadership, agency work and production systems, with a
-            current focus on using GenAI to accelerate exploration, prototyping, visual direction and
-            delivery without losing craft or brand consistency.
+            Os estudos usam IA para acelerar exploracao, visualizar cenas, testar universos e
+            vender uma ideia antes da producao final. O ganho esta no raciocinio criativo que guia
+            a ferramenta.
           </p>
-          <div class="contact-actions">
-            <a class="button primary" href="https://www.linkedin.com/in/vinisius/">LinkedIn profile</a>
-            <a class="button secondary" href="./README.md">Case notes</a>
-          </div>
         </div>
+      </section>
+
+      <section class="contact" id="contact">
+        <p class="eyebrow">Contact</p>
+        <h2>Vinisius Zen</h2>
+        <p>Creative direction, campaigns, 3D, visual storytelling and AI-assisted workflows.</p>
+        <a class="button" href="https://www.linkedin.com/in/vinisius/">LinkedIn</a>
       </section>
     </main>
 
