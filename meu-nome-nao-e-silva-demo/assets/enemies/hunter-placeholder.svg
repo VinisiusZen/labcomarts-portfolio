@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 220" role="img" aria-label="Hunter enemy placeholder">
+  <rect width="220" height="220" fill="none"/>
+  <g fill="#221911">
+    <ellipse cx="112" cy="44" rx="24" ry="25"/>
+    <path d="M78 75 C100 58 129 58 148 76 L158 146 C134 160 94 160 68 145Z"/>
+    <path d="M70 145 L47 205 L74 205 L99 153Z"/>
+    <path d="M150 145 L181 205 L207 205 L168 141Z"/>
+  </g>
+  <path d="M77 85 C112 98 145 95 168 82" fill="none" stroke="#564434" stroke-width="13" stroke-linecap="round"/>
+  <path d="M36 118 L165 66" stroke="#4b392c" stroke-width="9" stroke-linecap="round"/>
+</svg>

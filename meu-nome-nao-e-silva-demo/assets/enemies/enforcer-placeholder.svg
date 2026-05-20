@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 260" role="img" aria-label="Enforcer enemy placeholder">
+  <rect width="260" height="260" fill="none"/>
+  <g fill="#2b2117">
+    <ellipse cx="128" cy="52" rx="30" ry="31"/>
+    <path d="M84 89 C111 67 151 67 178 90 L194 168 C165 187 98 186 68 168Z"/>
+    <path d="M75 168 L48 240 L82 240 L115 178Z"/>
+    <path d="M179 168 L214 240 L246 240 L199 162Z"/>
+  </g>
+  <path d="M80 112 C114 130 157 130 195 111" fill="none" stroke="#6d5942" stroke-width="18" stroke-linecap="round"/>
+  <path d="M184 103 L226 154" stroke="#21170f" stroke-width="18" stroke-linecap="round"/>
+</svg>
