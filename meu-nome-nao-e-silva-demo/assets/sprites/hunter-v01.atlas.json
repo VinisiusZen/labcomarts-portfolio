@@ -1,0 +1,25 @@
+{
+  "image": "hunter-v01-clean.png",
+  "source": "C:/Users/Vinizen/Downloads/ChatGPT Image Apr 27, 2026, 05_55_54 PM.png",
+  "grid": {
+    "columns": 8,
+    "rows": 6,
+    "frameWidth": 181,
+    "frameHeight": 181
+  },
+  "animations": {
+    "enter": { "row": 0, "frames": [0, 1, 2, 3], "fps": 7, "loop": true },
+    "idle": { "row": 0, "frames": [0, 1, 2, 3, 4, 5, 6, 7], "fps": 7, "loop": true },
+    "chase": { "row": 1, "frames": [4, 5, 6, 7], "fps": 11, "loop": true },
+    "attack": { "row": 2, "frames": [0, 1, 2, 3, 4, 5, 6, 7], "fps": 14, "loop": false },
+    "rope": { "row": 3, "frames": [0, 1, 2, 3, 4, 5, 6, 7], "fps": 12, "loop": false },
+    "hit": { "row": 4, "frames": [0, 1, 2, 3], "fps": 10, "loop": false },
+    "stunned": { "row": 4, "frames": [2, 5, 6, 7], "fps": 8, "loop": false },
+    "defeated": { "row": 5, "frames": [0, 1, 2, 3], "fps": 6, "loop": false }
+  },
+  "notes": [
+    "Runtime uses this atlas by coordinate instead of physical frame files.",
+    "The source PNG had a baked checkerboard background; hunter-v01-clean.png removes neutral light checker pixels into alpha.",
+    "The source faces mostly right; the game flips it automatically when the hunter is to Silva's right."
+  ]
+}

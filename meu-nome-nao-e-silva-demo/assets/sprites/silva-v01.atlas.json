@@ -1,0 +1,27 @@
+{
+  "image": "silva-v01-clean.png",
+  "source": "C:/Users/Vinizen/Desktop/SILVA/assets/sprites/Silva_sprites_v01_png.png",
+  "grid": {
+    "columns": 8,
+    "rows": 6,
+    "frameWidth": 181,
+    "frameHeight": 181
+  },
+  "animations": {
+    "idle": { "row": 0, "frames": [0, 1, 2, 3, 4, 5, 6, 7], "fps": 7, "loop": true },
+    "walk": { "row": 1, "frames": [0, 1, 2, 3], "fps": 9, "loop": true },
+    "run": { "row": 1, "frames": [4, 5, 6, 7], "fps": 11, "loop": true },
+    "light": { "row": 2, "frames": [0, 1, 2, 3, 4, 5, 6, 7], "fps": 18, "loop": false },
+    "heavy": { "row": 3, "frames": [0, 1, 2, 3, 4, 5, 6, 7], "fps": 13, "loop": false },
+    "grab": { "row": 4, "frames": [0, 1, 2, 3], "fps": 12, "loop": false },
+    "dodge": { "row": 4, "frames": [1, 2, 3], "fps": 16, "loop": false },
+    "jump": { "row": 4, "frames": [4, 5, 6], "fps": 10, "loop": false },
+    "hit": { "row": 5, "frames": [0, 1, 2], "fps": 11, "loop": false },
+    "defeated": { "row": 5, "frames": [3, 4], "fps": 6, "loop": false },
+    "pulse": { "row": 5, "frames": [5, 6, 7], "fps": 9, "loop": false }
+  },
+  "notes": [
+    "Runtime uses this atlas by coordinate instead of physical frame files.",
+    "The source PNG had a baked checkerboard background; silva-v01-clean.png removes neutral light checker pixels into alpha."
+  ]
+}

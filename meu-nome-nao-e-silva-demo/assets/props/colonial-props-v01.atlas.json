@@ -1,0 +1,19 @@
+{
+  "image": "colonial-props-v01-clean.png",
+  "source": "C:/Users/Vinizen/Downloads/ChatGPT Image Apr 27, 2026, 07_41_47 PM (5).png",
+  "size": { "width": 1254, "height": 1254 },
+  "props": {
+    "ropeCoil": { "x": 20, "y": 18, "w": 155, "h": 85 },
+    "ropeLoose": { "x": 205, "y": 20, "w": 165, "h": 95 },
+    "lanternLit": { "x": 405, "y": 125, "w": 130, "h": 155 },
+    "lanternDark": { "x": 35, "y": 125, "w": 115, "h": 155 },
+    "stakesBound": { "x": 790, "y": 310, "w": 145, "h": 135 },
+    "fenceBroken": { "x": 515, "y": 610, "w": 205, "h": 95 },
+    "fenceLow": { "x": 50, "y": 610, "w": 165, "h": 95 },
+    "sackLarge": { "x": 65, "y": 420, "w": 170, "h": 130 },
+    "ritualPost": { "x": 750, "y": 735, "w": 70, "h": 135 },
+    "tornCloth": { "x": 215, "y": 880, "w": 110, "h": 105 },
+    "bundleWood": { "x": 820, "y": 1025, "w": 175, "h": 95 },
+    "ironShard": { "x": 935, "y": 1160, "w": 110, "h": 70 }
+  }
+}

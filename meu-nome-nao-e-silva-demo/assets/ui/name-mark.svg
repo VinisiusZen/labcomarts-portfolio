@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Prototype sigil with machete and double sash">
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#d8cfb7" stop-opacity=".24"/>
+      <stop offset="1" stop-color="#d8cfb7" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="400" height="400" fill="none"/>
+  <circle cx="200" cy="200" r="188" fill="url(#glow)"/>
+  <path d="M94 300 C150 255 229 186 302 80 C310 104 306 131 292 155 C256 220 183 282 126 326Z" fill="#d7cfb9"/>
+  <path d="M112 318 C165 275 246 202 316 98" fill="none" stroke="#16120f" stroke-width="10" stroke-linecap="round"/>
+  <path d="M75 220 C145 194 236 196 321 222" fill="none" stroke="#d8cfb7" stroke-width="34" stroke-linecap="round"/>
+  <path d="M84 229 C153 205 237 207 312 231" fill="none" stroke="#8d2f25" stroke-width="10" stroke-linecap="round"/>
+  <path d="M130 135 C175 110 233 110 274 137" fill="none" stroke="#d8cfb7" stroke-width="12" stroke-linecap="round"/>
+  <path d="M123 147 C173 172 233 172 282 145" fill="none" stroke="#8d2f25" stroke-width="7" stroke-linecap="round"/>
+  <g fill="#d8cfb7">
+    <circle cx="302" cy="255" r="9"/>
+    <circle cx="318" cy="275" r="6"/>
+    <circle cx="288" cy="282" r="5"/>
+  </g>
+</svg>

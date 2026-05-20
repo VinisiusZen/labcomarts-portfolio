@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="Moonlit black riverbank and dense jungle placeholder">
+  <defs>
+    <linearGradient id="sky" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#071012"/>
+      <stop offset=".52" stop-color="#08130f"/>
+      <stop offset="1" stop-color="#17120d"/>
+    </linearGradient>
+    <linearGradient id="river" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="#04080a"/>
+      <stop offset=".5" stop-color="#071820"/>
+      <stop offset="1" stop-color="#020506"/>
+    </linearGradient>
+    <filter id="blur"><feGaussianBlur stdDeviation="12"/></filter>
+  </defs>
+  <rect width="1600" height="900" fill="url(#sky)"/>
+  <circle cx="975" cy="130" r="94" fill="#d2d9d1" opacity=".32" filter="url(#blur)"/>
+  <path d="M0 410 C200 350 330 420 520 365 C730 305 830 360 1030 330 C1295 290 1420 340 1600 305 L1600 900 L0 900Z" fill="#07120d"/>
+  <path d="M0 570 C260 530 400 560 610 525 C795 495 985 550 1195 500 C1360 462 1490 485 1600 468 L1600 900 L0 900Z" fill="#0b1711"/>
+  <path d="M0 650 C190 620 355 660 540 635 C800 600 1030 680 1260 620 C1405 582 1515 600 1600 580 L1600 900 L0 900Z" fill="#1e1812"/>
+  <path d="M0 725 C230 690 450 705 680 680 C925 652 1150 715 1600 675 L1600 900 L0 900Z" fill="url(#river)" opacity=".9"/>
+  <g fill="none" stroke="#2b2219" stroke-width="16" stroke-linecap="round" opacity=".86">
+    <path d="M260 630 C330 585 420 595 485 560"/>
+    <path d="M310 690 C410 650 480 675 590 635"/>
+    <path d="M1015 645 C1090 598 1190 618 1290 565"/>
+    <path d="M1065 705 C1190 660 1280 705 1415 650"/>
+  </g>
+  <g stroke="#07100c" stroke-width="34" stroke-linecap="round">
+    <path d="M90 660 C120 500 110 345 155 170"/>
+    <path d="M1480 650 C1430 495 1460 330 1410 140"/>
+    <path d="M1260 610 C1235 470 1262 350 1215 240"/>
+  </g>
+  <g stroke="#112017" stroke-width="9" stroke-linecap="round" opacity=".9">
+    <path d="M110 360 C210 300 280 300 370 235"/>
+    <path d="M1460 340 C1345 280 1280 260 1190 205"/>
+    <path d="M1215 320 C1120 260 1050 255 960 210"/>
+  </g>
+  <g opacity=".5">
+    <path d="M0 750 C240 728 370 755 570 732 C770 710 1000 754 1220 724 C1400 700 1510 708 1600 690" fill="none" stroke="#a4b3ae" stroke-width="3"/>
+    <path d="M0 802 C280 770 490 810 760 782 C1040 754 1250 812 1600 770" fill="none" stroke="#73857f" stroke-width="2"/>
+  </g>
+</svg>

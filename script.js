@@ -73,6 +73,72 @@ const projects = [
     ]
   },
   {
+    id: "meu-nome-nao-e-silva-wip",
+    number: "WIP",
+    title: "Meu Nome Não É Silva",
+    category: "AI game production / beat 'em up WIP",
+    role: "Direção criativa, game design, pipeline de sprites e protótipo jogável",
+    tools: "HTML5 Canvas, JavaScript, GenAI, sprite sheets, state machine e maker backend",
+    year: "Work in progress",
+    hero: "./assets/mnes-wip/mnes-combat-gameplay.webp",
+    video: "./assets/mnes-wip/mnes-wip-loop.mp4",
+    liveUrl: "./meu-nome-nao-e-silva-demo/",
+    codeUrl: "https://github.com/VinisiusZen/labcomarts-portfolio/tree/main/meu-nome-nao-e-silva-demo",
+    tags: [
+      "AI game production",
+      "Playable vertical slice",
+      "Beat 'em up prototype",
+      "AI-assisted sprite pipeline",
+      "Creative Technologist",
+      "Game feel prototyping",
+      "HTML5 Canvas game prototype",
+      "Data-driven combat tuning",
+      "State machine design",
+      "Backend Maker",
+      "State cycler QA",
+      "Prompt library",
+      "AI Art Direction",
+      "Original IP development"
+    ],
+    soundtracks: [
+      {
+        label: "O Rio Sabe - menu theme",
+        src: "./meu-nome-nao-e-silva-demo/assets/audio/o-rio-sabe-theme.mp3"
+      },
+      {
+        label: "Press Start cue",
+        src: "./meu-nome-nao-e-silva-demo/assets/audio/press-start-placeholder.mp3"
+      }
+    ],
+    levelGallery: [
+      "./assets/mnes-wip/mnes-level-riverbank.webp",
+      "./assets/mnes-wip/mnes-level-quilombo.webp",
+      "./assets/mnes-wip/mnes-level-colonial.webp"
+    ],
+    customGallery: [
+      "./assets/mnes-wip/mnes-title-menu.webp",
+      "./assets/mnes-wip/mnes-combat-gameplay.webp",
+      "./assets/mnes-wip/mnes-combat-action.webp",
+      "./assets/mnes-wip/mnes-backend-maker.webp",
+      "./assets/mnes-wip/mnes-state-cycler.webp",
+      "./assets/mnes-wip/mnes-combat-river.webp"
+    ],
+    summary:
+      "Experiência de produção de game com AI em andamento: uma vertical slice 2.5D de beat 'em up que junta IP original, sprites, combate, áudio, maker/backend e QA visual.",
+    challenge:
+      "Transformar uma ideia autoral em algo testável, com fantasia clara, leitura de combate, cenas, inimigos e um pipeline capaz de receber assets gerados por AI sem quebrar a consistência do jogo.",
+    solution:
+      "O protótipo organiza a produção em sistemas: Canvas jogável, mapa de ações, frame data, spritesheets com alpha, editor de estados, maker/backend, galeria de cenários, intro cinemática e trilha inicial para validar a experiência enquanto os assets finais evoluem.",
+    highlights: [
+      "Demo jogável online com combate 2.5D, HUD, inimigos, dano, combos, especiais e restart.",
+      "Pipeline de sprites por AI com atlas, limpeza de alpha, margem técnica e revisão de baseline.",
+      "Backend Maker para revisar personagens, luta, inimigos, cenários e prompts técnicos.",
+      "State Cycler para QA de animações, transições, slots de sprite/SFX e estados planejados.",
+      "Trilha e cue inicial como estudo de áudio para menu, atmosfera e identidade do protótipo.",
+      "Case posicionado como Creative Technologist, AI Art Direction e GenAI production workflow."
+    ]
+  },
+  {
     id: "cinema-mask-action",
     number: "01",
     title: "Uma ação para cinema",
