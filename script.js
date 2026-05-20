@@ -210,6 +210,59 @@ const projects = [
     ]
   },
   {
+    id: "packshot-3d-agencias",
+    number: "04",
+    title: "Packshot 3D",
+    compactTitle: true,
+    category: "3D packshot / agencies sales case",
+    role: "Direção visual, modelagem, render, motion e comunicação comercial",
+    tools: "Cinema 4D, After Effects, Photoshop, render em alta resolução",
+    year: "Commercial 3D",
+    hero: "./assets/packshot-3d/packshot-render.webp",
+    video: "./assets/packshot-3d/vacina-render-rise.mp4",
+    tags: [
+      "3D Packshot",
+      "Product visualization",
+      "High-resolution render",
+      "Motion design",
+      "Agency sales material",
+      "Commercial 3D",
+      "Healthcare content",
+      "Social media carousel",
+      "Cinema 4D",
+      "After Effects"
+    ],
+    carouselGallery: Array.from(
+      { length: 9 },
+      (_, index) => `./assets/packshot-3d/carousel-${String(index + 1).padStart(2, "0")}.webp`
+    ),
+    processVideos: [
+      {
+        label: "Making of - render em alta resolução",
+        src: "./assets/packshot-3d/making-of-10k-render.mp4",
+        poster: "./assets/packshot-3d/packshot-render.webp"
+      }
+    ],
+    customGallery: [
+      "./assets/packshot-3d/packshot-render.webp",
+      "./assets/packshot-3d/xarope-frasco.webp",
+      "./assets/packshot-3d/rotulo-xarope-mel.webp"
+    ],
+    summary:
+      "Case criado para vender jobs de 3D para agências: carrossel comercial, render de produto, vídeo de packshot e making-of mostrando produção em altíssima resolução.",
+    challenge:
+      "Transformar uma oferta técnica de 3D em uma peça comercial simples de entender, capaz de mostrar qualidade visual, processo e aplicações reais para conquistar jobs com agências.",
+    solution:
+      "Foi criado um carrossel de venda para Instagram, com linguagem direta sobre packshots sob medida, acompanhado por renders de produto e um vídeo 3D de vacina que demonstra iluminação, profundidade, textura e acabamento de motion.",
+    highlights: [
+      "Carrossel comercial explicando a oferta de packshot 3D para marcas e agências.",
+      "Vídeo de packshot sobre vacina usado como render principal do case.",
+      "Making-of mostrando trabalho em alta resolução e controle de detalhe.",
+      "Aplicações para pharma, healthcare, embalagem, social content e campanhas.",
+      "Material criado para prospecção, que ajudou a fechar jobs de 3D."
+    ]
+  },
+  {
     id: "vacinas-3d",
     number: "04",
     title: "Vídeo 3D sobre vacinas",
@@ -509,7 +562,7 @@ function renderDetail() {
       <aside class="project-aside">
         <a class="back-link" href="./index.html#work">← Back to work</a>
         <div class="project-count">${project.number} / ${String(projects.length).padStart(2, "0")}</div>
-        <h1>${project.title}</h1>
+        <h1 class="${project.compactTitle ? "compact-title" : ""}">${project.title}</h1>
         <p class="project-category">${project.category}</p>
         <p class="project-summary">${project.summary}</p>
         <dl class="meta-list">
@@ -579,6 +632,52 @@ function renderDetail() {
                           <strong>${track.label}</strong>
                           <audio controls preload="none" src="${track.src}"></audio>
                         </article>
+                      `
+                    )
+                    .join("")}
+                </div>
+              </section>`
+            : ""
+        }
+
+        ${
+          project.processVideos
+            ? `<section class="process-module">
+                <div>
+                  <p class="eyebrow">Making of</p>
+                  <h2>Processo, resolução e controle de render.</h2>
+                </div>
+                <div class="video-grid">
+                  ${project.processVideos
+                    .map(
+                      (item) => `
+                        <article>
+                          <video src="${item.src}" poster="${item.poster || project.hero}" controls muted loop playsinline preload="metadata"></video>
+                          <strong>${item.label}</strong>
+                        </article>
+                      `
+                    )
+                    .join("")}
+                </div>
+              </section>`
+            : ""
+        }
+
+        ${
+          project.carouselGallery
+            ? `<section class="process-module">
+                <div>
+                  <p class="eyebrow">Instagram carousel</p>
+                  <h2>Carrossel comercial usado para vender o serviço.</h2>
+                </div>
+                <div class="carousel-strip" aria-label="Carrossel do projeto">
+                  ${project.carouselGallery
+                    .map(
+                      (image, imageIndex) => `
+                        <figure>
+                          <img src="${image}" alt="${project.title} - carrossel ${imageIndex + 1}" />
+                          <figcaption>${String(imageIndex + 1).padStart(2, "0")}</figcaption>
+                        </figure>
                       `
                     )
                     .join("")}

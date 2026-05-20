@@ -483,6 +483,10 @@ h1 mark {
   overflow-wrap: normal;
 }
 
+.project-aside h1.compact-title {
+  font-size: clamp(3rem, 4.6vw, 4.35rem);
+}
+
 .project-category {
   margin-bottom: 26px;
   color: var(--acid);
@@ -686,6 +690,61 @@ h1 mark {
 
 .audio-grid audio {
   width: 100%;
+}
+
+.video-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.video-grid article {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.video-grid video {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border: 1px solid var(--line);
+  background: var(--panel);
+}
+
+.video-grid strong {
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+}
+
+.carousel-strip {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(220px, 34%);
+  gap: 10px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  padding-bottom: 12px;
+  scrollbar-color: var(--acid) transparent;
+}
+
+.carousel-strip figure {
+  margin: 0;
+  border: 1px solid var(--line);
+  background: var(--panel);
+}
+
+.carousel-strip img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
+.carousel-strip figcaption {
+  padding: 10px;
+  color: var(--soft);
+  font-size: 0.72rem;
+  text-transform: uppercase;
 }
 
 .level-gallery {
