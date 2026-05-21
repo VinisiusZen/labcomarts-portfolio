@@ -111,7 +111,9 @@ input {
   font-size: 18px;
   font-weight: 700;
   justify-content: center;
-  min-width: 50px;
+  flex: 0 0 50px;
+  height: 50px;
+  width: 50px;
   overflow: hidden;
   position: relative;
 }
@@ -1011,7 +1013,9 @@ h3 {
   }
 
   .brand-mark {
-    min-width: 44px;
+    flex-basis: 44px;
+    height: 44px;
+    width: 44px;
   }
 
   .hero {
