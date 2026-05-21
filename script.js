@@ -3,6 +3,48 @@ const thumb = (number) => `./assets/work/thumbs/slide-${String(number).padStart(
 
 const projects = [
   {
+    id: "ufo-aqui",
+    number: "NEW",
+    title: "UFO_AQUI",
+    category: "Immersive editorial portal / 360 WebGL experience",
+    role: "Direção criativa, UI premium, implementação front-end e viewer 360",
+    tools: "HTML, CSS, JavaScript, Three.js, equirectangular assets e GenAI",
+    year: "2026",
+    hero: "./ufo-aqui/assets/hero-intelligence.png",
+    liveUrl: "./ufo-aqui/",
+    codeUrl: "https://github.com/VinisiusZen/labcomarts-portfolio/tree/main/ufo-aqui",
+    slides: [],
+    customGallery: [
+      "./ufo-aqui/assets/hero-intelligence.png",
+      "./ufo-aqui/assets/portal-360.png",
+      "./ufo-aqui/assets/archive-dossier.png",
+      "./ufo-aqui/assets/area51-panorama.png",
+      "./ufo-aqui/assets/media-network.png"
+    ],
+    tags: [
+      "Editorial portal",
+      "UAP/UFO visual identity",
+      "Three.js 360 viewer",
+      "Interactive hotspots",
+      "Brazilian disclosure media",
+      "AI-assisted art direction",
+      "Static GitHub Pages deploy"
+    ],
+    summary:
+      "Portal brasileiro premium sobre UFOs/UAPs, arquivos desclassificados, radar de notícias e experiências 360° com estética de central de inteligência.",
+    challenge:
+      "Transformar um briefing amplo de mídia investigativa, lore, curadoria e experiências imersivas em uma subpágina publicável, visualmente forte e sem depender de CMS ou build nesta primeira versão.",
+    solution:
+      "A entrega organiza o UFO_AQUI como plataforma editorial estática: hero cinematográfico, módulos de arquivos/casos/radar, classificação factual, seção de comunidade e viewer 360 WebGL com fullscreen, auto-rotate e hotspots.",
+    highlights: [
+      "Subpágina pronta para GitHub Pages em /ufo-aqui/.",
+      "Viewer equirectangular com Three.js, drag, zoom, fullscreen, auto-rotate e hotspots clicáveis.",
+      "Design system dark com verde radar, dourado militar, scanlines, HUD e painéis translúcidos.",
+      "Dados editoriais mockados para arquivos, casos, radar e classificação de credibilidade.",
+      "Assets do projeto copiados e normalizados para publicação independente."
+    ]
+  },
+  {
     id: "vida-de-gato-wip",
     number: "WIP",
     title: "Vida de gato",
