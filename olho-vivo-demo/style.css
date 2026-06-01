@@ -1,0 +1,173 @@
+:root {
+  color-scheme: dark;
+  --bg: #030207;
+  --ink: #f9fbff;
+  --muted: rgba(249, 251, 255, 0.62);
+  --pink: #ff4fd8;
+  --green: #78ff5d;
+  --gold: #ffe96a;
+  --cyan: #62f9ff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 55%, rgba(85, 24, 118, 0.22), transparent 44%),
+    radial-gradient(circle at 72% 18%, rgba(20, 246, 197, 0.1), transparent 28%),
+    var(--bg);
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+button {
+  font: inherit;
+}
+
+.shell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100vw;
+  height: 100svh;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 12%),
+    radial-gradient(circle at center, rgba(255, 79, 216, 0.08), transparent 56%);
+}
+
+#game {
+  width: min(100vw, calc(100svh * 16 / 9));
+  height: min(100svh, calc(100vw * 9 / 16));
+  display: block;
+  background: #04030a;
+  border-radius: clamp(0px, 1.6vw, 18px);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 24px 80px rgba(0, 0, 0, 0.72),
+    0 0 120px rgba(255, 79, 216, 0.18);
+  image-rendering: pixelated;
+  touch-action: none;
+}
+
+.scanline {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.22;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.028) 0,
+    rgba(255, 255, 255, 0.028) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+  mix-blend-mode: overlay;
+}
+
+.boot-card {
+  position: absolute;
+  width: min(420px, calc(100vw - 36px));
+  padding: 24px;
+  color: var(--ink);
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background:
+    linear-gradient(145deg, rgba(15, 10, 30, 0.92), rgba(5, 4, 12, 0.82)),
+    radial-gradient(circle at 50% 0%, rgba(255, 79, 216, 0.24), transparent 62%);
+  box-shadow:
+    0 20px 80px rgba(0, 0, 0, 0.66),
+    0 0 60px rgba(120, 255, 93, 0.1);
+  backdrop-filter: blur(18px);
+}
+
+.boot-card.hidden {
+  opacity: 0;
+  transform: translateY(8px) scale(0.98);
+  pointer-events: none;
+  transition: opacity 220ms ease, transform 220ms ease;
+}
+
+.mark {
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+}
+
+h1 {
+  margin: 8px 0 8px;
+  font-size: clamp(30px, 5vw, 52px);
+  line-height: 0.94;
+  letter-spacing: 0;
+}
+
+p {
+  margin: 0 auto 18px;
+  color: var(--muted);
+  max-width: 29ch;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.controls span,
+.status-pill {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(249, 251, 255, 0.74);
+  background: rgba(255, 255, 255, 0.055);
+  font-size: 12px;
+}
+
+.controls span {
+  padding: 6px 8px;
+}
+
+#startButton {
+  min-width: 150px;
+  min-height: 42px;
+  color: #08030b;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  border: 0;
+  background: linear-gradient(90deg, var(--green), var(--cyan), var(--pink), var(--gold));
+  box-shadow: 0 0 30px rgba(255, 79, 216, 0.32);
+  cursor: pointer;
+}
+
+.status-pill {
+  position: absolute;
+  right: max(14px, env(safe-area-inset-right));
+  bottom: max(14px, env(safe-area-inset-bottom));
+  padding: 7px 9px;
+  opacity: 0.78;
+  pointer-events: none;
+}
+
+@media (orientation: portrait) {
+  .shell::before {
+    content: "gire o telefone";
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    z-index: 3;
+    transform: translateX(-50%);
+    padding: 8px 10px;
+    color: rgba(249, 251, 255, 0.72);
+    background: rgba(0, 0, 0, 0.42);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    font-size: 12px;
+  }
+}
