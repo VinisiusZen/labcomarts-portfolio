@@ -42,6 +42,10 @@ const ASSETS = {
   debtClockSheet: "./assets/new/transparent/enemy-debt-clock-boleto-sheet.png",
   mushroomSheet: "./assets/new/transparent/pickup-mushroom-spore-bloom-sheet.png",
   sacredAnimalSheet: "./assets/new/transparent/effect-sacred-animal-encounter-sheet.png",
+  causticOrbitSheet: "./assets/layers/transparent/power-caustic-orbit-sheet.png",
+  contactSparkSheet: "./assets/layers/transparent/power-contact-spark-sheet.png",
+  prismAfterimageSheet: "./assets/layers/transparent/power-prism-afterimage-sheet.png",
+  overloadGlintsSheet: "./assets/layers/transparent/power-overload-glints-sheet.png",
   stageNoise: "./assets/backgrounds/runtime/stage-noise.png",
   stageMarket: "./assets/backgrounds/runtime/stage-market.png",
   stageGarden: "./assets/backgrounds/runtime/stage-garden.png",
@@ -190,6 +194,7 @@ const game = {
   rituals: [],
   particles: [],
   effects: [],
+  afterimages: [],
   damageTexts: [],
 };
 
@@ -397,6 +402,18 @@ function spawnEffect(sheetKey, x, y, size = 90, life = 0.75, rotation = 0) {
   });
 }
 
+function spawnAfterimage(x, y, rotation, size = 82, life = 0.38) {
+  game.afterimages.push({
+    x,
+    y,
+    rotation,
+    size,
+    life,
+    maxLife: life,
+    frameOffset: Math.floor(rand(0, 5)),
+  });
+}
+
 function seedMinuteSixState() {
   game.enemies.length = 0;
   game.bullets.length = 0;
@@ -541,6 +558,7 @@ function applyPowerChoice(index) {
   setEyeState("evolve", 1.25);
   sfx("level");
   spawnEffect("effectAscensionSheet", game.player.x, game.player.y, 170, 1.1);
+  spawnEffect("overloadGlintsSheet", game.player.x, game.player.y, 130, 0.72, rand(-0.6, 0.6));
 }
 
 function dropXp(x, y, amount, rare = false) {
@@ -686,12 +704,17 @@ function dash(inputOverride = null) {
   if (dashCooldown > 0) return;
   const input = inputOverride || readInput();
   if (Math.abs(input.x) + Math.abs(input.y) < 0.1) return;
+  const before = { x: game.player.x, y: game.player.y };
   game.player.x += input.x * 86;
   game.player.y += input.y * 86;
   game.player.invuln = Math.max(game.player.invuln, 0.32);
   game.shake = Math.max(game.shake, 4);
   dashCooldown = 0.85;
   sfx("dash");
+  for (let i = 0; i < 3; i++) {
+    spawnAfterimage(before.x + input.x * i * 24, before.y + input.y * i * 24, Math.atan2(input.y, input.x), 78 - i * 8, 0.34 + i * 0.05);
+  }
+  spawnEffect("overloadGlintsSheet", game.player.x, game.player.y, 94, 0.48, Math.atan2(input.y, input.x));
   burst(game.player.x, game.player.y, "#62f9ff", 18, 180);
 }
 
@@ -792,6 +815,7 @@ function update(dt) {
   updateDrops(dt);
   updateParticles(dt);
   updateEffects(dt);
+  updateAfterimages(dt);
   cleanup();
 }
 
@@ -826,7 +850,10 @@ function updateEnemies(dt) {
       const push = (enemy.radius + shieldRadius * 0.42 - d) * 0.7;
       enemy.x -= Math.cos(a) * push;
       enemy.y -= Math.sin(a) * push;
-      if (Math.random() < 0.08) burst(enemy.x, enemy.y, "#ffe96a", 1, 40);
+      if (Math.random() < 0.1) burst(enemy.x, enemy.y, "#ffe96a", 1, 40);
+      if (Math.random() < 0.045 + sigilLevel * 0.012) {
+        spawnEffect("contactSparkSheet", enemy.x, enemy.y, 58 + sigilLevel * 7, 0.34, a + Math.PI);
+      }
     }
 
     if (d < enemy.radius + game.player.radius && game.player.invuln <= 0) {
@@ -888,10 +915,11 @@ function updateDrops(dt) {
         game.clarity = game.clarity % 1;
         game.focus = Math.min(1, game.focus + 0.08);
         game.flash = 0.26;
-        setEyeState("evolve", 1.25);
-        sfx("level");
-        game.damageTexts.push({ x: game.player.x, y: game.player.y, r: 20, life: 1.25, color: "#78ff5d" });
-        offerPowerUpgrade();
+      setEyeState("evolve", 1.25);
+      sfx("level");
+      game.damageTexts.push({ x: game.player.x, y: game.player.y, r: 20, life: 1.25, color: "#78ff5d" });
+      spawnEffect("overloadGlintsSheet", game.player.x, game.player.y, 118, 0.65, rand(-0.4, 0.4));
+      offerPowerUpgrade();
       }
     }
   }
@@ -908,6 +936,7 @@ function updateDrops(dt) {
       game.shake = 11;
       sfx("sugar");
       burst(sugar.x, sugar.y, "#fff6ff", 34, 260);
+      spawnEffect("overloadGlintsSheet", sugar.x, sugar.y, 112, 0.62, rand(-0.4, 0.4));
       if (game.sugar >= 3) sugarCrash();
     }
   }
@@ -958,6 +987,16 @@ function updateEffects(dt) {
   }
 }
 
+function updateAfterimages(dt) {
+  const speed = Math.hypot(game.player.vx, game.player.vy);
+  if (speed > 185 && Math.random() < 0.22) {
+    spawnAfterimage(game.player.x - game.player.vx * 0.045, game.player.y - game.player.vy * 0.045, Math.atan2(game.player.vy, game.player.vx), 58, 0.24);
+  }
+  for (const image of game.afterimages) {
+    image.life -= dt;
+  }
+}
+
 function cleanup() {
   for (let i = game.enemies.length - 1; i >= 0; i--) {
     const enemy = game.enemies[i];
@@ -985,6 +1024,7 @@ function cleanup() {
   game.rituals = game.rituals.filter((r) => !r.dead && r.life > 0);
   game.particles = game.particles.filter((p) => p.life > 0);
   game.effects = game.effects.filter((p) => p.life > 0);
+  game.afterimages = game.afterimages.filter((p) => p.life > 0);
   game.damageTexts = game.damageTexts.filter((t) => t.life > 0);
 }
 
@@ -1005,6 +1045,7 @@ function sugarCrash() {
   setEyeState("death", 1.1);
   sfx("damage");
   game.cameraX = cameraTargetX();
+  spawnEffect("overloadGlintsSheet", game.player.x, game.player.y, 160, 0.8, rand(-0.8, 0.8));
   burst(game.player.x, game.player.y, "#ffffff", 90, 360);
 }
 
@@ -1042,6 +1083,7 @@ function resetRun() {
   game.rituals.length = 0;
   game.particles.length = 0;
   game.effects.length = 0;
+  game.afterimages.length = 0;
   game.damageTexts.length = 0;
 }
 
@@ -1075,6 +1117,7 @@ function draw() {
   drawEnemies();
   drawObstacles();
   drawPowersBehind();
+  drawAfterimages();
   drawPlayer();
   drawBullets();
   drawEffects();
@@ -1354,19 +1397,25 @@ function drawPowersBehind() {
   ctx.translate(p.x, p.y);
   ctx.globalCompositeOperation = "lighter";
   if (sigilLevel > 0) {
-    ctx.strokeStyle = "rgba(255, 79, 216, 0.55)";
-    ctx.lineWidth = 1.5 + sigilLevel * 0.35;
+    const frame = Math.floor(game.time * (10 + sigilLevel) + sigilLevel) % 16;
+    const hitScale = shield * 2.15;
+    ctx.globalAlpha = 0.52 + sigilLevel * 0.055;
+    drawSheetFrame(images.causticOrbitSheet, frame, 0, 0, hitScale, game.time * (0.26 + sigilLevel * 0.035));
+    ctx.globalAlpha = 0.28;
+    drawSheetFrame(images.causticOrbitSheet, (frame + 7) % 16, 0, 0, hitScale * 0.82, -game.time * 0.34);
+    ctx.globalAlpha = 0.58;
+    ctx.strokeStyle = "rgba(98,249,255,0.28)";
+    ctx.lineWidth = 1;
+    ctx.setLineDash([2, 13]);
     ctx.beginPath();
-    ctx.arc(0, 0, shield, 0, TAU);
+    ctx.arc(0, 0, shield * 0.42, 0, TAU);
     ctx.stroke();
-    ctx.strokeStyle = "rgba(120, 255, 93, 0.36)";
-    ctx.rotate(game.time * (0.72 + sigilLevel * 0.06));
-    for (let i = 0; i < 10 + sigilLevel * 2; i++) {
-      const a = (i / (10 + sigilLevel * 2)) * TAU;
-      ctx.beginPath();
-      ctx.moveTo(Math.cos(a) * (shield - 7), Math.sin(a) * (shield - 7));
-      ctx.lineTo(Math.cos(a) * (shield + 14), Math.sin(a) * (shield + 14));
-      ctx.stroke();
+    ctx.setLineDash([]);
+    for (let i = 0; i < 4 + sigilLevel; i++) {
+      const a = game.time * (1.1 + sigilLevel * 0.08) + (i / (4 + sigilLevel)) * TAU;
+      const r = shield * 0.42 + Math.sin(game.time * 3 + i) * 4;
+      ctx.fillStyle = i % 2 ? "rgba(255,79,216,0.72)" : "rgba(98,249,255,0.72)";
+      ctx.fillRect(Math.cos(a) * r - 1.5, Math.sin(a) * r - 1.5, 3, 3);
     }
   }
   if (leafLevel > 0) {
@@ -1386,6 +1435,18 @@ function drawPowersBehind() {
     ctx.beginPath();
     ctx.arc(t.x, t.y, t.r, 0, TAU);
     ctx.stroke();
+    ctx.restore();
+  }
+}
+
+function drawAfterimages() {
+  for (const image of game.afterimages) {
+    const progress = 1 - image.life / image.maxLife;
+    const frame = clamp(Math.floor(progress * 16) + image.frameOffset, 0, 15);
+    ctx.save();
+    ctx.globalCompositeOperation = "lighter";
+    ctx.globalAlpha = clamp(image.life / image.maxLife, 0, 1) * 0.42;
+    drawSheetFrame(images.prismAfterimageSheet, frame, image.x, image.y, image.size, image.rotation);
     ctx.restore();
   }
 }
