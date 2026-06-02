@@ -35,6 +35,9 @@ const ASSETS = {
   eyeDeathSheet: "./assets/states/transparent/eye-death-sheet.png",
   notificationSheet: "./assets/states/transparent/enemy-notification-pulse-sheet.png",
   billSheet: "./assets/states/transparent/enemy-bill-flap-sheet.png",
+  effectExplosionSheet: "./assets/effects/transparent/effect-prism-explosion-sheet.png",
+  effectAscensionSheet: "./assets/effects/transparent/effect-ascension-sheet.png",
+  effectSmokeSheet: "./assets/effects/transparent/effect-smoke-dissolve-sheet.png",
   stageNoise: "./assets/backgrounds/runtime/stage-noise.png",
   stageMarket: "./assets/backgrounds/runtime/stage-market.png",
   stageGarden: "./assets/backgrounds/runtime/stage-garden.png",
@@ -93,6 +96,18 @@ const STAGES = [
   },
 ];
 
+const POWER_DEFS = {
+  prism: { name: "Raio Prisma", color: "#ff4fd8", icon: "PR" },
+  sigil: { name: "Sigilo Guarda", color: "#62f9ff", icon: "SG" },
+  leaf: { name: "Folha Xamanica", color: "#78ff5d", icon: "FL" },
+  lotus: { name: "Pulso Empatico", color: "#ff7ade", icon: "PE" },
+  butter: { name: "Manteiga Solar", color: "#ffe96a", icon: "MS" },
+};
+
+const POWER_KEYS = Object.keys(POWER_DEFS);
+const INTRO_NAMES = ["TRANSITO", "NOTICIAS", "CONSUMO", "BOLETOS", "BURNOUT", "BUROCRACIA"];
+const WAVE_PATTERNS = ["block", "worm", "sides", "swarm", "escort", "sugarLine"];
+
 const bgStars = Array.from({ length: 280 }, (_, i) => ({
   x: (i * 197 + 41) % WORLD.w,
   y: (i * 113 + 83) % H,
@@ -119,12 +134,15 @@ let padDashQueued = false;
 let audioCtx = null;
 
 const game = {
-  time: 390,
-  level: 12,
-  focus: 0.72,
-  clarity: 0.63,
-  sugar: 1,
-  sugarTimer: 7.5,
+  mode: "boot",
+  time: 0,
+  level: 1,
+  focus: 1,
+  clarity: 0,
+  sugar: 0,
+  sugarTimer: 0,
+  sugarPulse: 0,
+  sugarSignal: 0,
   flash: 0,
   damagePulse: 0,
   eyeState: "idle",
@@ -134,11 +152,23 @@ const game = {
   stageIndex: 0,
   spawn: 0,
   crystalSpawn: 0,
+  waveTimer: 1.2,
+  waveIndex: 0,
+  introTime: 0,
+  introDuration: 8.5,
   pulse: 0,
   shot: 0,
   leafShot: 0,
+  butterShot: 0,
   ambientTimer: 3.5,
   enemyId: 0,
+  upgradeChoices: [],
+  fusionMessage: "",
+  fusionTimer: 0,
+  powers: [
+    { key: "prism", level: 1 },
+    { key: "sigil", level: 1 },
+  ],
   player: {
     x: PLAYER_START.x,
     y: PLAYER_START.y,
@@ -152,6 +182,7 @@ const game = {
   xp: [],
   sugars: [],
   particles: [],
+  effects: [],
   damageTexts: [],
 };
 
@@ -263,6 +294,15 @@ function activeStage() {
   return STAGES[game.stageIndex];
 }
 
+function powerLevel(key) {
+  return game.powers.find((power) => power.key === key)?.level || 0;
+}
+
+function getEnemyType(key = null) {
+  if (!key) return ENEMY_TYPES[Math.floor(rand(0, ENEMY_TYPES.length))];
+  return ENEMY_TYPES.find((type) => type.key === key) || ENEMY_TYPES[0];
+}
+
 function cameraTargetX() {
   return clamp(game.player.x - W * 0.5, 0, WORLD.w - W);
 }
@@ -300,7 +340,7 @@ function drawSheetFrame(img, frame, x, y, maxSize, rotation = 0) {
   ctx.restore();
 }
 
-function spawnEnemy(crystal = false) {
+function spawnEnemy(crystal = false, typeKey = null) {
   const side = Math.floor(rand(0, 4));
   const pad = 70;
   const left = game.cameraX;
@@ -311,29 +351,13 @@ function spawnEnemy(crystal = false) {
     { x: clamp(rand(left - pad, right + pad), -pad, WORLD.w + pad), y: H + pad },
     { x: clamp(left - pad, -pad, WORLD.w + pad), y: rand(-pad, H + pad) },
   ][side];
-  const type = ENEMY_TYPES[Math.floor(rand(0, ENEMY_TYPES.length))];
-  const elite = crystal || Math.random() < 0.09;
-  game.enemies.push({
-    id: game.enemyId++,
-    type,
-    x: pos.x,
-    y: pos.y,
-    hp: type.hp * (elite ? 2.5 : 1),
-    maxHp: type.hp * (elite ? 2.5 : 1),
-    speed: type.speed * rand(0.9, 1.14) * (elite ? 0.82 : 1),
-    radius: type.radius * (elite ? 1.28 : 1),
-    size: type.size * (elite ? 1.36 : 1),
-    rot: rand(0, TAU),
-    drift: rand(-1, 1),
-    crystal: elite,
-    hit: 0,
-  });
+  spawnEnemyAt(pos.x, pos.y, crystal, typeKey);
 }
 
-function spawnEnemyAt(x, y, crystal = false) {
-  const type = ENEMY_TYPES[Math.floor(rand(0, ENEMY_TYPES.length))];
+function spawnEnemyAt(x, y, crystal = false, typeKey = null, options = {}) {
+  const type = getEnemyType(typeKey);
   const elite = crystal || Math.random() < 0.08;
-  game.enemies.push({
+  const enemy = {
     id: game.enemyId++,
     type,
     x,
@@ -347,6 +371,22 @@ function spawnEnemyAt(x, y, crystal = false) {
     drift: rand(-1, 1),
     crystal: elite,
     hit: 0,
+    wormPhase: options.wormPhase,
+    waveGlow: options.waveGlow || 0,
+  };
+  game.enemies.push(enemy);
+}
+
+function spawnEffect(sheetKey, x, y, size = 90, life = 0.75, rotation = 0) {
+  game.effects.push({
+    sheetKey,
+    x,
+    y,
+    size,
+    life,
+    maxLife: life,
+    rotation,
+    frameOffset: Math.floor(rand(0, 4)),
   });
 }
 
@@ -384,6 +424,116 @@ function seedMinuteSixState() {
 
   dropSugar(game.player.x + 190, H * 0.48);
   burst(game.player.x, game.player.y, "#ff4fd8", 28, 150);
+}
+
+function sideSpawnPoint(side, offset = 0) {
+  const left = game.cameraX;
+  const right = game.cameraX + W;
+  const pad = 78;
+  if (side === "left") return { x: clamp(left - pad - offset, -pad, WORLD.w + pad), y: rand(92, H - 70) };
+  if (side === "right") return { x: clamp(right + pad + offset, -pad, WORLD.w + pad), y: rand(92, H - 70) };
+  if (side === "top") return { x: clamp(rand(left + 40, right - 40), 40, WORLD.w - 40), y: -pad - offset };
+  return { x: clamp(rand(left + 40, right - 40), 40, WORLD.w - 40), y: H + pad + offset };
+}
+
+function spawnWave() {
+  if (game.enemies.length > 74) return;
+  const pattern = WAVE_PATTERNS[game.waveIndex % WAVE_PATTERNS.length];
+  const pressure = clamp(1 + game.time / 120, 1, 2.25);
+  const side = ["left", "right", "top", "bottom"][Math.floor(rand(0, 4))];
+  const type = ENEMY_TYPES[(game.waveIndex + Math.floor(rand(0, 3))) % ENEMY_TYPES.length].key;
+  const count = Math.floor(rand(6, 10) * pressure);
+  game.waveIndex += 1;
+
+  if (pattern === "block") {
+    const origin = sideSpawnPoint(side);
+    const cols = Math.ceil(Math.sqrt(count));
+    for (let i = 0; i < count; i++) {
+      const x = origin.x + (i % cols) * 38 * (side === "left" ? -1 : 1);
+      const y = origin.y + (Math.floor(i / cols) - cols * 0.45) * 34;
+      spawnEnemyAt(x, clamp(y, 48, H - 36), i % 11 === 0, type, { waveGlow: 0.8 });
+    }
+  } else if (pattern === "worm") {
+    const origin = sideSpawnPoint(side);
+    const angle = angleTo(origin, game.player);
+    for (let i = 0; i < count + 5; i++) {
+      const x = origin.x - Math.cos(angle) * i * 34;
+      const y = origin.y - Math.sin(angle) * i * 28 + Math.sin(i * 0.9) * 22;
+      spawnEnemyAt(x, y, false, type, { wormPhase: i * 0.45, waveGlow: 0.45 });
+    }
+  } else if (pattern === "sides") {
+    const pair = Math.random() > 0.5 ? ["left", "right"] : ["top", "bottom"];
+    for (const entrySide of pair) {
+      for (let i = 0; i < Math.ceil(count * 0.65); i++) {
+        const p = sideSpawnPoint(entrySide, i * 8);
+        spawnEnemyAt(p.x, p.y, i === 0 && entrySide === pair[0], null, { waveGlow: 0.55 });
+      }
+    }
+  } else if (pattern === "swarm") {
+    for (let i = 0; i < count + 8; i++) {
+      const p = sideSpawnPoint(["left", "right", "top", "bottom"][i % 4], rand(0, 80));
+      spawnEnemyAt(p.x, p.y, false, i % 3 === 0 ? "news" : "notification", { waveGlow: 0.7 });
+    }
+  } else if (pattern === "escort") {
+    const p = sideSpawnPoint(side);
+    spawnEnemyAt(p.x, p.y, true, Math.random() > 0.5 ? "burnout" : "stamp", { waveGlow: 1 });
+    for (let i = 0; i < count; i++) {
+      const a = (i / count) * TAU;
+      spawnEnemyAt(p.x + Math.cos(a) * 96, p.y + Math.sin(a) * 72, false, i % 2 ? "bill" : "folder", { waveGlow: 0.5 });
+    }
+  } else {
+    for (let i = 0; i < Math.ceil(count * 0.7); i++) {
+      const p = sideSpawnPoint(["left", "right"][i % 2], i * 14);
+      spawnEnemyAt(p.x, p.y, i % 3 === 0, i % 2 ? "cart" : "car", { waveGlow: 1 });
+    }
+  }
+
+  burst(game.player.x, game.player.y, activeStage().tint, 8, 90);
+}
+
+function makeUpgradeChoices() {
+  const pool = [...POWER_KEYS].sort(() => Math.random() - 0.5);
+  const current = game.powers.map((power) => power.key).filter((key) => powerLevel(key) < 5);
+  const keys = [...current, ...pool].filter((key, index, arr) => arr.indexOf(key) === index).slice(0, 3);
+  while (keys.length < 3) keys.push(pool[Math.floor(rand(0, pool.length))]);
+  return keys.map((key) => ({ key, level: powerLevel(key), def: POWER_DEFS[key] }));
+}
+
+function offerPowerUpgrade() {
+  game.upgradeChoices = makeUpgradeChoices();
+  game.mode = "upgrade";
+  game.fusionMessage = "";
+  game.fusionTimer = 0;
+  burst(game.player.x, game.player.y, "#78ff5d", 42, 230);
+}
+
+function applyPowerChoice(index) {
+  const choice = game.upgradeChoices[index];
+  if (!choice) return;
+  const existing = game.powers.find((power) => power.key === choice.key);
+  if (existing) {
+    existing.level = Math.min(5, existing.level + 1);
+    game.fusionMessage = `${POWER_DEFS[choice.key].name} nivel ${existing.level}`;
+  } else if (game.powers.length < 2) {
+    game.powers.push({ key: choice.key, level: 1 });
+    game.fusionMessage = `${POWER_DEFS[choice.key].name} despertou`;
+  } else {
+    const weakest = [...game.powers].sort((a, b) => a.level - b.level)[0];
+    const removedName = POWER_DEFS[weakest.key].name;
+    game.powers = game.powers.filter((power) => power !== weakest);
+    const strongest = game.powers.sort((a, b) => b.level - a.level)[0];
+    if (strongest) strongest.level = Math.min(5, strongest.level + 1);
+    game.powers.push({ key: choice.key, level: 1 });
+    game.fusionMessage = `${removedName} dissolveu em build`;
+    spawnEffect("effectSmokeSheet", game.player.x, game.player.y, 140, 0.9, rand(-0.4, 0.4));
+  }
+  game.mode = "playing";
+  game.upgradeChoices = [];
+  game.fusionTimer = 2.1;
+  game.flash = Math.max(game.flash, 0.35);
+  setEyeState("evolve", 1.25);
+  sfx("level");
+  spawnEffect("effectAscensionSheet", game.player.x, game.player.y, 170, 1.1);
 }
 
 function dropXp(x, y, amount, rare = false) {
@@ -451,7 +601,7 @@ function burst(x, y, color, count = 10, power = 120) {
   }
 }
 
-function fireAtNearest(kind = "prism") {
+function fireAtNearest(kind = "prism", level = 1, angleOffset = 0) {
   if (!game.enemies.length) return;
   let target = game.enemies[0];
   let best = Infinity;
@@ -462,18 +612,18 @@ function fireAtNearest(kind = "prism") {
       target = enemy;
     }
   }
-  const a = angleTo(game.player, target) + rand(-0.06, 0.06);
-  const speed = kind === "leaf" ? 360 : 430;
+  const a = angleTo(game.player, target) + angleOffset + rand(-0.06, 0.06);
+  const speed = kind === "leaf" ? 340 + level * 18 : kind === "butter" ? 300 + level * 16 : 420 + level * 20;
   game.bullets.push({
     x: game.player.x,
     y: game.player.y,
     vx: Math.cos(a) * speed,
     vy: Math.sin(a) * speed,
-    radius: kind === "leaf" ? 8 : 7,
-    damage: kind === "leaf" ? 0.85 : 1.15,
-    life: kind === "leaf" ? 1.15 : 1.45,
+    radius: kind === "leaf" ? 7 + level * 0.5 : kind === "butter" ? 10 : 7 + level * 0.3,
+    damage: kind === "leaf" ? 0.62 + level * 0.22 : kind === "butter" ? 0.95 + level * 0.25 : 1 + level * 0.22,
+    life: kind === "leaf" ? 1.05 + level * 0.05 : kind === "butter" ? 1.65 : 1.35 + level * 0.04,
     kind,
-    color: kind === "leaf" ? "#78ff5d" : "#ff4fd8",
+    color: kind === "leaf" ? "#78ff5d" : kind === "butter" ? "#ffe96a" : "#ff4fd8",
     trail: [],
   });
 }
@@ -529,9 +679,23 @@ function dash(inputOverride = null) {
 }
 
 function update(dt) {
+  if (game.mode === "intro") {
+    updateIntro(dt);
+    return;
+  }
+  if (game.mode === "upgrade") {
+    game.flash = Math.max(0, game.flash - dt * 1.6);
+    game.fusionTimer = Math.max(0, game.fusionTimer - dt);
+    updateParticles(dt);
+    updateEffects(dt);
+    return;
+  }
+
   game.time += dt;
   game.flash = Math.max(0, game.flash - dt * 1.6);
   game.damagePulse = Math.max(0, game.damagePulse - dt * 2.2);
+  game.sugarPulse = Math.max(0, game.sugarPulse - dt * 1.7);
+  game.fusionTimer = Math.max(0, game.fusionTimer - dt);
   if (game.eyeStateTimer > 0) {
     game.eyeStateTimer = Math.max(0, game.eyeStateTimer - dt);
     if (game.eyeStateTimer === 0) game.eyeState = "idle";
@@ -561,40 +725,46 @@ function update(dt) {
   resolvePlayerObstacles();
   game.cameraX += (cameraTargetX() - game.cameraX) * Math.min(1, dt * 8);
 
-  game.spawn -= dt;
-  if (game.spawn <= 0 && game.enemies.length < 58) {
-    const count = game.enemies.length < 35 ? 4 : 2;
-    for (let i = 0; i < count; i++) spawnEnemy(false);
-    game.spawn = rand(0.62, 1.05);
+  game.waveTimer -= dt;
+  if (game.waveTimer <= 0 || game.enemies.length < 5) {
+    spawnWave();
+    game.waveTimer = rand(4.2, 7.2) - Math.min(1.4, game.time / 120);
   }
 
-  game.crystalSpawn -= dt;
-  if (game.crystalSpawn <= 0) {
-    spawnEnemy(true);
-    game.crystalSpawn = rand(5.2, 8.8);
-  }
-
+  const prismLevel = powerLevel("prism");
   game.shot -= dt;
-  if (game.shot <= 0) {
-    fireAtNearest("prism");
-    if (game.sugar > 0) setTimeout(() => fireAtNearest("prism"), 70);
-    game.shot = game.sugar > 0 ? 0.34 : 0.48;
+  if (prismLevel > 0 && game.shot <= 0) {
+    const spread = prismLevel >= 4 ? 0.16 : 0;
+    fireAtNearest("prism", prismLevel, -spread);
+    if (prismLevel >= 4) fireAtNearest("prism", prismLevel, spread);
+    if (game.sugar > 0) setTimeout(() => fireAtNearest("prism", prismLevel), 70);
+    game.shot = (game.sugar > 0 ? 0.36 : 0.58) - prismLevel * 0.045;
   }
 
+  const leafLevel = powerLevel("leaf");
   game.leafShot -= dt;
-  if (game.leafShot <= 0) {
-    fireAtNearest("leaf");
-    game.leafShot = 0.92;
+  if (leafLevel > 0 && game.leafShot <= 0) {
+    const count = leafLevel >= 5 ? 3 : leafLevel >= 3 ? 2 : 1;
+    for (let i = 0; i < count; i++) fireAtNearest("leaf", leafLevel, (i - (count - 1) / 2) * 0.25);
+    game.leafShot = 1.18 - leafLevel * 0.09;
   }
 
+  const butterLevel = powerLevel("butter");
+  game.butterShot -= dt;
+  if (butterLevel > 0 && game.butterShot <= 0) {
+    fireAtNearest("butter", butterLevel);
+    game.butterShot = 1.6 - butterLevel * 0.12;
+  }
+
+  const lotusLevel = powerLevel("lotus");
   game.pulse -= dt;
-  if (game.pulse <= 0) {
-    game.pulse = 2.8;
+  if (lotusLevel > 0 && game.pulse <= 0) {
+    game.pulse = 3.05 - lotusLevel * 0.24;
     game.damageTexts.push({ x: game.player.x, y: game.player.y, r: 10, life: 0.8, color: "#ff7ade" });
     for (const enemy of game.enemies) {
       const d = dist(game.player, enemy);
-      if (d < 118) {
-        enemy.hp -= 0.75;
+      if (d < 105 + lotusLevel * 18) {
+        enemy.hp -= 0.48 + lotusLevel * 0.26;
         enemy.hit = 0.12;
       }
     }
@@ -604,21 +774,38 @@ function update(dt) {
   updateBullets(dt);
   updateDrops(dt);
   updateParticles(dt);
+  updateEffects(dt);
   cleanup();
 }
 
+function updateIntro(dt) {
+  game.introTime += dt;
+  game.time += dt;
+  game.flash = Math.max(0, game.flash - dt * 1.2);
+  updateParticles(dt);
+  if (Math.random() < 0.45) {
+    const a = rand(0, TAU);
+    const r = rand(70, 320);
+    burst(W * 0.5 + Math.cos(a) * r, H * 0.52 + Math.sin(a) * r * 0.65, ["#ff4fd8", "#62f9ff", "#78ff5d", "#ffe96a"][Math.floor(rand(0, 4))], 1, 170);
+  }
+  if (game.introTime >= game.introDuration) beginRun();
+}
+
 function updateEnemies(dt) {
-  const shieldRadius = 70 + Math.sin(game.time * 4) * 3;
+  const sigilLevel = powerLevel("sigil");
+  const shieldRadius = (sigilLevel > 0 ? 48 + sigilLevel * 13 : 20) + Math.sin(game.time * 4) * 3;
   for (const enemy of game.enemies) {
-    const a = angleTo(enemy, game.player) + Math.sin(game.time * 1.2 + enemy.id) * 0.16 * enemy.drift;
+    let a = angleTo(enemy, game.player) + Math.sin(game.time * 1.2 + enemy.id) * 0.16 * enemy.drift;
+    if (enemy.wormPhase !== undefined) a += Math.sin(game.time * 2.4 + enemy.wormPhase) * 0.42;
     enemy.x += Math.cos(a) * enemy.speed * dt;
     enemy.y += Math.sin(a) * enemy.speed * dt;
     enemy.rot = a;
     enemy.hit = Math.max(0, enemy.hit - dt);
+    enemy.waveGlow = Math.max(0, enemy.waveGlow - dt * 0.55);
 
     const d = dist(enemy, game.player);
-    if (d < enemy.radius + shieldRadius * 0.42) {
-      enemy.hp -= 0.72 * dt;
+    if (sigilLevel > 0 && d < enemy.radius + shieldRadius * 0.42) {
+      enemy.hp -= (0.42 + sigilLevel * 0.16) * dt;
       const push = (enemy.radius + shieldRadius * 0.42 - d) * 0.7;
       enemy.x -= Math.cos(a) * push;
       enemy.y -= Math.sin(a) * push;
@@ -634,7 +821,7 @@ function updateEnemies(dt) {
       setEyeState("damage", 0.58);
       sfx("damage");
       burst(game.player.x, game.player.y, "#ff4f57", 20, 190);
-      if (game.focus <= 0) resetRun();
+      if (game.focus <= 0) beginRun();
     }
   }
 }
@@ -687,6 +874,7 @@ function updateDrops(dt) {
         setEyeState("evolve", 1.25);
         sfx("level");
         game.damageTexts.push({ x: game.player.x, y: game.player.y, r: 20, life: 1.25, color: "#78ff5d" });
+        offerPowerUpgrade();
       }
     }
   }
@@ -696,6 +884,8 @@ function updateDrops(dt) {
     if (dist(sugar, game.player) < sugar.radius + game.player.radius + 1) {
       game.sugar += 1;
       game.sugarTimer = 9;
+      game.sugarPulse = 1.25;
+      game.sugarSignal = game.sugar;
       sugar.dead = true;
       game.flash = 0.5;
       game.shake = 11;
@@ -720,12 +910,26 @@ function updateParticles(dt) {
   }
 }
 
+function updateEffects(dt) {
+  for (const effect of game.effects) {
+    effect.life -= dt;
+  }
+}
+
 function cleanup() {
   for (let i = game.enemies.length - 1; i >= 0; i--) {
     const enemy = game.enemies[i];
     if (enemy.hp <= 0) {
       dropXp(enemy.x, enemy.y, enemy.type.xp + (enemy.crystal ? 4 : 0), enemy.crystal);
       if (enemy.crystal && Math.random() < 0.72) dropSugar(enemy.x, enemy.y);
+      spawnEffect(
+        enemy.crystal ? "effectAscensionSheet" : Math.random() > 0.5 ? "effectExplosionSheet" : "effectSmokeSheet",
+        enemy.x,
+        enemy.y,
+        enemy.crystal ? 128 : 94,
+        enemy.crystal ? 0.95 : 0.7,
+        rand(-0.5, 0.5),
+      );
       burst(enemy.x, enemy.y, enemy.crystal ? "#fff6ff" : enemy.type.color, enemy.crystal ? 20 : 9, 145);
       game.enemies.splice(i, 1);
     }
@@ -734,12 +938,15 @@ function cleanup() {
   game.xp = game.xp.filter((x) => x.life > 0);
   game.sugars = game.sugars.filter((s) => !s.dead);
   game.particles = game.particles.filter((p) => p.life > 0);
+  game.effects = game.effects.filter((p) => p.life > 0);
   game.damageTexts = game.damageTexts.filter((t) => t.life > 0);
 }
 
 function sugarCrash() {
   game.sugar = 0;
   game.sugarTimer = 0;
+  game.sugarPulse = 1.4;
+  game.sugarSignal = 3;
   game.focus = 0.72;
   game.player.x = PLAYER_START.x;
   game.player.y = PLAYER_START.y;
@@ -756,16 +963,50 @@ function sugarCrash() {
 }
 
 function resetRun() {
-  game.focus = 0.72;
-  game.clarity = 0.63;
-  game.sugar = 1;
-  game.sugarTimer = 7.5;
+  game.time = 0;
+  game.level = 1;
+  game.focus = 1;
+  game.clarity = 0;
+  game.sugar = 0;
+  game.sugarTimer = 0;
+  game.sugarPulse = 0;
+  game.sugarSignal = 0;
+  game.waveTimer = 1.0;
+  game.waveIndex = 0;
+  game.shot = 0.35;
+  game.leafShot = 0.9;
+  game.butterShot = 1.2;
+  game.pulse = 2.2;
+  game.fusionMessage = "";
+  game.fusionTimer = 0;
+  game.upgradeChoices = [];
+  game.powers = [
+    { key: "prism", level: 1 },
+    { key: "sigil", level: 1 },
+  ];
   game.player.x = PLAYER_START.x;
   game.player.y = PLAYER_START.y;
   game.player.vx = 0;
   game.player.vy = 0;
   game.cameraX = cameraTargetX();
-  seedMinuteSixState();
+  game.enemies.length = 0;
+  game.bullets.length = 0;
+  game.xp.length = 0;
+  game.sugars.length = 0;
+  game.particles.length = 0;
+  game.effects.length = 0;
+  game.damageTexts.length = 0;
+}
+
+function beginRun() {
+  resetRun();
+  game.mode = "playing";
+  game.flash = 0.45;
+  game.player.invuln = 1.1;
+  spawnEffect("effectAscensionSheet", game.player.x, game.player.y, 168, 1.2);
+  burst(game.player.x, game.player.y, "#62f9ff", 54, 240);
+  spawnWave();
+  game.waveTimer = 5.2;
 }
 
 function draw() {
@@ -774,6 +1015,12 @@ function draw() {
   ctx.save();
   ctx.clearRect(0, 0, W, H);
   ctx.translate(sx, sy);
+  if (game.mode === "intro") {
+    drawIntro();
+    drawFlash();
+    ctx.restore();
+    return;
+  }
   drawBackground();
   ctx.save();
   ctx.translate(-game.cameraX, 0);
@@ -783,10 +1030,91 @@ function draw() {
   drawPowersBehind();
   drawPlayer();
   drawBullets();
+  drawEffects();
   drawParticles();
   ctx.restore();
   drawUi();
+  if (game.mode === "upgrade") drawUpgradeOverlay();
   drawFlash();
+  ctx.restore();
+}
+
+function drawIntro() {
+  const t = game.introTime;
+  ctx.fillStyle = "#020106";
+  ctx.fillRect(0, 0, W, H);
+
+  const bg = images.stageNoise;
+  if (bg) {
+    const pan = (Math.sin(t * 0.12) * 0.5 + 0.5) * (WORLD.w - W);
+    ctx.globalAlpha = 0.58;
+    ctx.drawImage(bg, pan, 0, W, H, 0, 0, W, H);
+    ctx.globalAlpha = 1;
+  }
+
+  ctx.save();
+  ctx.globalCompositeOperation = "lighter";
+  for (let i = 0; i < INTRO_NAMES.length; i++) {
+    const y = 104 + i * 96 + Math.sin(t * 1.3 + i) * 16;
+    const x = W * 0.5 + Math.sin(t * 0.7 + i * 1.7) * 220;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(Math.sin(t * 0.4 + i) * 0.08);
+    ctx.globalAlpha = 0.045 + (Math.sin(t * 5 + i) > 0.75 ? 0.075 : 0);
+    ctx.fillStyle = ["#ff4fd8", "#62f9ff", "#78ff5d", "#ffe96a"][i % 4];
+    ctx.font = "900 92px ui-sans-serif, system-ui, sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText(INTRO_NAMES[i], 0, 0);
+    ctx.restore();
+  }
+
+  for (let i = 0; i < 18; i++) {
+    const a = t * (0.55 + i * 0.015) + (i / 18) * TAU;
+    const r = 172 + Math.sin(t * 1.8 + i) * 38;
+    const x = W * 0.5 + Math.cos(a) * r;
+    const y = H * 0.52 + Math.sin(a) * r * 0.55;
+    ctx.globalAlpha = 0.08;
+    ctx.fillStyle = ["#ff4fd8", "#62f9ff", "#78ff5d", "#ffe96a"][i % 4];
+    ctx.beginPath();
+    ctx.arc(x, y, 22 + Math.sin(t * 4 + i) * 7, 0, TAU);
+    ctx.fill();
+  }
+  ctx.restore();
+
+  const enemies = ["car", "news", "cart", "notification", "bill", "folder", "stamp", "burnout"];
+  for (let i = 0; i < enemies.length; i++) {
+    const key = enemies[i];
+    const img = images[key];
+    const a = -t * 0.95 + (i / enemies.length) * TAU;
+    const r = 238 + Math.sin(t * 1.4 + i) * 28;
+    const x = W * 0.5 + Math.cos(a) * r;
+    const y = H * 0.52 + Math.sin(a) * r * 0.62;
+    const size = 54 + Math.sin(t * 3 + i) * 6;
+    ctx.save();
+    ctx.globalCompositeOperation = "lighter";
+    for (let k = 3; k >= 1; k--) {
+      ctx.globalAlpha = 0.09 * k;
+      drawSprite(img, x - Math.cos(a) * k * 16, y - Math.sin(a) * k * 12, size + k * 9, a + t);
+    }
+    ctx.globalAlpha = 1;
+    drawSprite(img, x, y, size, a + t * 0.8);
+    ctx.restore();
+  }
+
+  const effectFrame = Math.floor((t * 14) % 16);
+  const stage = Math.floor(t / 2.1) % 3;
+  const effectKey = stage === 0 ? "effectExplosionSheet" : stage === 1 ? "effectAscensionSheet" : "effectSmokeSheet";
+  drawSheetFrame(images[effectKey], effectFrame, W * 0.5, H * 0.53, 245 + Math.sin(t * 5) * 18, Math.sin(t) * 0.18);
+  drawSheetFrame(images.eyeEvolveSheet, Math.floor(t * 11) % 16, W * 0.5, H * 0.53, 76, 0);
+
+  drawParticles();
+  ctx.save();
+  ctx.globalCompositeOperation = "lighter";
+  ctx.globalAlpha = clamp((game.introDuration - t) / 1.2, 0, 1) * 0.85;
+  ctx.fillStyle = "rgba(249,251,255,0.74)";
+  ctx.font = "12px ui-monospace, SFMono-Regular, Menlo, monospace";
+  ctx.textAlign = "center";
+  ctx.fillText("toque para pular a abertura", W * 0.5, H - 34);
   ctx.restore();
 }
 
@@ -890,7 +1218,7 @@ function drawEnemies() {
     const scaleHit = enemy.hit > 0 ? 1.16 : 1;
     const size = enemy.size * scaleHit;
     ctx.globalCompositeOperation = "lighter";
-    ctx.globalAlpha = enemy.crystal ? 0.5 : 0.11;
+    ctx.globalAlpha = enemy.crystal ? 0.5 : 0.11 + enemy.waveGlow * 0.16;
     ctx.fillStyle = enemy.crystal ? "rgba(255,230,255,0.64)" : enemy.type.color;
     ctx.beginPath();
     ctx.arc(0, 0, enemy.radius * (enemy.crystal ? 1.95 : 1.28), 0, TAU);
@@ -954,27 +1282,33 @@ function drawDrops() {
 
 function drawPowersBehind() {
   const p = game.player;
-  const shield = 69 + Math.sin(game.time * 4) * 3;
+  const sigilLevel = powerLevel("sigil");
+  const leafLevel = powerLevel("leaf");
+  const shield = (sigilLevel > 0 ? 48 + sigilLevel * 13 : 18) + Math.sin(game.time * 4) * 3;
   ctx.save();
   ctx.translate(p.x, p.y);
   ctx.globalCompositeOperation = "lighter";
-  ctx.strokeStyle = "rgba(255, 79, 216, 0.55)";
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.arc(0, 0, shield, 0, TAU);
-  ctx.stroke();
-  ctx.strokeStyle = "rgba(120, 255, 93, 0.36)";
-  ctx.rotate(game.time * 0.9);
-  for (let i = 0; i < 12; i++) {
-    const a = (i / 12) * TAU;
+  if (sigilLevel > 0) {
+    ctx.strokeStyle = "rgba(255, 79, 216, 0.55)";
+    ctx.lineWidth = 1.5 + sigilLevel * 0.35;
     ctx.beginPath();
-    ctx.moveTo(Math.cos(a) * (shield - 7), Math.sin(a) * (shield - 7));
-    ctx.lineTo(Math.cos(a) * (shield + 14), Math.sin(a) * (shield + 14));
+    ctx.arc(0, 0, shield, 0, TAU);
     ctx.stroke();
+    ctx.strokeStyle = "rgba(120, 255, 93, 0.36)";
+    ctx.rotate(game.time * (0.72 + sigilLevel * 0.06));
+    for (let i = 0; i < 10 + sigilLevel * 2; i++) {
+      const a = (i / (10 + sigilLevel * 2)) * TAU;
+      ctx.beginPath();
+      ctx.moveTo(Math.cos(a) * (shield - 7), Math.sin(a) * (shield - 7));
+      ctx.lineTo(Math.cos(a) * (shield + 14), Math.sin(a) * (shield + 14));
+      ctx.stroke();
+    }
   }
-  for (let i = 0; i < 5; i++) {
-    const a = game.time * 1.7 + (i / 5) * TAU;
-    drawLeaf(Math.cos(a) * 52, Math.sin(a) * 52, a);
+  if (leafLevel > 0) {
+    for (let i = 0; i < 3 + leafLevel; i++) {
+      const a = game.time * (1.4 + leafLevel * 0.08) + (i / (3 + leafLevel)) * TAU;
+      drawLeaf(Math.cos(a) * 52, Math.sin(a) * 52, a);
+    }
   }
   ctx.restore();
 
@@ -1069,7 +1403,18 @@ function drawBullets() {
     ctx.globalAlpha = 1;
     ctx.translate(bullet.x, bullet.y);
     ctx.rotate(Math.atan2(bullet.vy, bullet.vx));
-    drawSprite(bullet.kind === "leaf" ? images.projectileLeaf : images.projectilePrism, 0, 0, bullet.kind === "leaf" ? 22 : 25, 0);
+    drawSprite(bullet.kind === "leaf" ? images.projectileLeaf : images.projectilePrism, 0, 0, bullet.kind === "leaf" ? 22 : bullet.kind === "butter" ? 31 : 25, 0);
+    ctx.restore();
+  }
+}
+
+function drawEffects() {
+  for (const effect of game.effects) {
+    const frame = clamp(Math.floor((1 - effect.life / effect.maxLife) * 16) + effect.frameOffset, 0, 15);
+    ctx.save();
+    ctx.globalCompositeOperation = "lighter";
+    ctx.globalAlpha = clamp(effect.life / effect.maxLife, 0, 1);
+    drawSheetFrame(images[effect.sheetKey], frame, effect.x, effect.y, effect.size, effect.rotation);
     ctx.restore();
   }
 }
@@ -1131,7 +1476,100 @@ function drawUi() {
     ctx.restore();
   }
 
+  drawPowerUi();
+  drawSugarPulse();
   drawGhostControls();
+  ctx.restore();
+}
+
+function drawPowerUi() {
+  ctx.save();
+  ctx.textAlign = "left";
+  ctx.font = "11px ui-monospace, SFMono-Regular, Menlo, monospace";
+  for (let i = 0; i < game.powers.length; i++) {
+    const power = game.powers[i];
+    const def = POWER_DEFS[power.key];
+    const x = 24;
+    const y = 54 + i * 28;
+    ctx.globalCompositeOperation = "source-over";
+    ctx.fillStyle = "rgba(0,0,0,0.26)";
+    ctx.fillRect(x, y, 170, 20);
+    ctx.strokeStyle = "rgba(255,255,255,0.12)";
+    ctx.strokeRect(x, y, 170, 20);
+    ctx.fillStyle = def.color;
+    ctx.fillRect(x + 4, y + 4, (118 * power.level) / 5, 12);
+    ctx.fillStyle = "rgba(249,251,255,0.78)";
+    ctx.fillText(`${def.icon}  ${power.level}/5`, x + 8, y + 14);
+  }
+  if (game.fusionTimer > 0 && game.fusionMessage) {
+    ctx.globalCompositeOperation = "lighter";
+    ctx.globalAlpha = clamp(game.fusionTimer / 2.1, 0, 1);
+    ctx.fillStyle = "#ffe96a";
+    ctx.font = "13px ui-monospace, SFMono-Regular, Menlo, monospace";
+    ctx.textAlign = "center";
+    ctx.fillText(game.fusionMessage, W * 0.5, 72);
+  }
+  ctx.restore();
+}
+
+function drawSugarPulse() {
+  if (game.sugarPulse <= 0) return;
+  const a = clamp(game.sugarPulse, 0, 1);
+  ctx.save();
+  ctx.globalCompositeOperation = "lighter";
+  ctx.globalAlpha = a * (0.3 + Math.abs(Math.sin(game.time * 24)) * 0.55);
+  const spacing = 54;
+  const total = Math.max(1, game.sugarSignal || game.sugar);
+  for (let i = 0; i < total; i++) {
+    const x = W * 0.5 + (i - (total - 1) / 2) * spacing;
+    drawSheetFrame(images.sugarSheet, Math.floor(game.time * 16 + i) % 16, x, H * 0.46, 54 + a * 18, 0);
+  }
+  ctx.strokeStyle = game.sugar >= 3 ? "rgba(255,35,90,0.96)" : "rgba(255,245,255,0.72)";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.arc(W * 0.5, H * 0.46, 48 + total * 26 + Math.sin(game.time * 20) * 4, 0, TAU);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawUpgradeOverlay() {
+  ctx.save();
+  ctx.fillStyle = "rgba(0,0,0,0.38)";
+  ctx.fillRect(0, 0, W, H);
+  ctx.globalCompositeOperation = "lighter";
+  ctx.textAlign = "center";
+  ctx.fillStyle = "rgba(249,251,255,0.82)";
+  ctx.font = "900 34px ui-sans-serif, system-ui, sans-serif";
+  ctx.fillText("ESCOLHA O PROXIMO SINAL", W * 0.5, H * 0.28);
+  ctx.font = "12px ui-monospace, SFMono-Regular, Menlo, monospace";
+  ctx.fillStyle = "rgba(249,251,255,0.55)";
+  ctx.fillText("3o poder dissolve o mais fraco e fortalece a build", W * 0.5, H * 0.32);
+
+  for (let i = 0; i < game.upgradeChoices.length; i++) {
+    const choice = game.upgradeChoices[i];
+    const def = choice.def;
+    const x = W * 0.5 + (i - 1) * 245;
+    const y = H * 0.52;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.globalCompositeOperation = "lighter";
+    ctx.globalAlpha = 0.26 + Math.sin(game.time * 5 + i) * 0.08;
+    ctx.fillStyle = def.color;
+    ctx.beginPath();
+    ctx.arc(0, 0, 82, 0, TAU);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    ctx.strokeStyle = def.color;
+    ctx.lineWidth = 2;
+    drawMandala(0, 0, 72, game.time * 0.8 + i);
+    ctx.fillStyle = "rgba(249,251,255,0.92)";
+    ctx.font = "900 18px ui-sans-serif, system-ui, sans-serif";
+    ctx.fillText(def.name.toUpperCase(), 0, -8);
+    ctx.font = "12px ui-monospace, SFMono-Regular, Menlo, monospace";
+    const next = choice.level ? Math.min(5, choice.level + 1) : 1;
+    ctx.fillText(`${i + 1}  NIVEL ${next}/5`, 0, 20);
+    ctx.restore();
+  }
   ctx.restore();
 }
 
@@ -1198,11 +1636,23 @@ function start() {
   running = true;
   bootCard.classList.add("hidden");
   resetRun();
+  game.mode = "intro";
+  game.introTime = 0;
+  game.flash = 0.55;
+  burst(W * 0.5, H * 0.52, "#ff4fd8", 80, 320);
 }
 
 function setupInput() {
   window.addEventListener("keydown", (event) => {
     keys.add(event.key.toLowerCase());
+    if (game.mode === "intro" && (event.key === " " || event.key === "Enter")) {
+      beginRun();
+      return;
+    }
+    if (game.mode === "upgrade" && ["1", "2", "3"].includes(event.key)) {
+      applyPowerChoice(Number(event.key) - 1);
+      return;
+    }
     if (event.key === " " || event.key === "Shift") dash();
     if (event.key === "1" || event.key === "2" || event.key === "3") {
       game.stageIndex = Number(event.key) - 1;
@@ -1233,9 +1683,18 @@ function setupInput() {
   });
 
   canvas.addEventListener("pointerdown", (event) => {
+    const p = toCanvas(event);
+    if (game.mode === "intro") {
+      beginRun();
+      return;
+    }
+    if (game.mode === "upgrade") {
+      const index = clamp(Math.floor((p.x - (W * 0.5 - 365)) / 245), 0, 2);
+      applyPowerChoice(index);
+      return;
+    }
     pointerId = event.pointerId;
     canvas.setPointerCapture(pointerId);
-    const p = toCanvas(event);
     pointerOrigin = p;
     pointerVector = { x: 0, y: 0 };
     if (!running) start();
@@ -1272,7 +1731,6 @@ function clearPointer(event) {
 async function init() {
   setupInput();
   await loadImages();
-  seedMinuteSixState();
   requestAnimationFrame(loop);
 }
 
