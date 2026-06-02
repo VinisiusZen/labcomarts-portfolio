@@ -38,6 +38,10 @@ const ASSETS = {
   effectExplosionSheet: "./assets/effects/transparent/effect-prism-explosion-sheet.png",
   effectAscensionSheet: "./assets/effects/transparent/effect-ascension-sheet.png",
   effectSmokeSheet: "./assets/effects/transparent/effect-smoke-dissolve-sheet.png",
+  doomscrollSheet: "./assets/new/transparent/enemy-doomscroll-phone-snake-sheet.png",
+  debtClockSheet: "./assets/new/transparent/enemy-debt-clock-boleto-sheet.png",
+  mushroomSheet: "./assets/new/transparent/pickup-mushroom-spore-bloom-sheet.png",
+  sacredAnimalSheet: "./assets/new/transparent/effect-sacred-animal-encounter-sheet.png",
   stageNoise: "./assets/backgrounds/runtime/stage-noise.png",
   stageMarket: "./assets/backgrounds/runtime/stage-market.png",
   stageGarden: "./assets/backgrounds/runtime/stage-garden.png",
@@ -52,6 +56,8 @@ const ENEMY_TYPES = [
   { key: "folder", hp: 2.5, speed: 38, radius: 17, size: 50, color: "#f7c85a", xp: 4 },
   { key: "stamp", hp: 3.6, speed: 36, radius: 20, size: 56, color: "#c88342", xp: 5 },
   { key: "burnout", hp: 2.8, speed: 30, radius: 23, size: 62, color: "#b666ff", xp: 5 },
+  { key: "doomscroll", sheet: "doomscrollSheet", hp: 1.5, speed: 86, radius: 15, size: 46, color: "#ff4fd8", xp: 3 },
+  { key: "debtClock", sheet: "debtClockSheet", hp: 2.4, speed: 44, radius: 18, size: 50, color: "#d7f2c6", xp: 4 },
 ];
 
 const STAGES = [
@@ -181,6 +187,7 @@ const game = {
   bullets: [],
   xp: [],
   sugars: [],
+  rituals: [],
   particles: [],
   effects: [],
   damageTexts: [],
@@ -472,14 +479,14 @@ function spawnWave() {
   } else if (pattern === "swarm") {
     for (let i = 0; i < count + 8; i++) {
       const p = sideSpawnPoint(["left", "right", "top", "bottom"][i % 4], rand(0, 80));
-      spawnEnemyAt(p.x, p.y, false, i % 3 === 0 ? "news" : "notification", { waveGlow: 0.7 });
+      spawnEnemyAt(p.x, p.y, false, i % 4 === 0 ? "doomscroll" : i % 3 === 0 ? "news" : "notification", { waveGlow: 0.7 });
     }
   } else if (pattern === "escort") {
     const p = sideSpawnPoint(side);
-    spawnEnemyAt(p.x, p.y, true, Math.random() > 0.5 ? "burnout" : "stamp", { waveGlow: 1 });
+    spawnEnemyAt(p.x, p.y, true, Math.random() > 0.5 ? "burnout" : "debtClock", { waveGlow: 1 });
     for (let i = 0; i < count; i++) {
       const a = (i / count) * TAU;
-      spawnEnemyAt(p.x + Math.cos(a) * 96, p.y + Math.sin(a) * 72, false, i % 2 ? "bill" : "folder", { waveGlow: 0.5 });
+      spawnEnemyAt(p.x + Math.cos(a) * 96, p.y + Math.sin(a) * 72, false, i % 2 ? "bill" : "debtClock", { waveGlow: 0.5 });
     }
   } else {
     for (let i = 0; i < Math.ceil(count * 0.7); i++) {
@@ -557,6 +564,16 @@ function dropSugar(x, y) {
     y: y + rand(-10, 10),
     radius: 11,
     pulse: rand(0, TAU),
+  });
+}
+
+function dropRitual(x, y) {
+  game.rituals.push({
+    x: x + rand(-12, 12),
+    y: y + rand(-12, 12),
+    radius: 16,
+    pulse: rand(0, TAU),
+    life: 18,
   });
 }
 
@@ -894,6 +911,31 @@ function updateDrops(dt) {
       if (game.sugar >= 3) sugarCrash();
     }
   }
+
+  for (const ritual of game.rituals) {
+    ritual.life -= dt;
+    ritual.pulse += dt * 4.8;
+    const d = dist(ritual, game.player);
+    if (d < 96) {
+      const a = angleTo(ritual, game.player);
+      ritual.x += Math.cos(a) * 180 * dt;
+      ritual.y += Math.sin(a) * 180 * dt;
+    }
+    if (d < ritual.radius + game.player.radius + 3) {
+      ritual.dead = true;
+      game.focus = Math.min(1, game.focus + 0.22);
+      game.clarity = Math.min(0.98, game.clarity + 0.18);
+      game.sugar = Math.max(0, game.sugar - 1);
+      game.sugarSignal = game.sugar;
+      game.flash = Math.max(game.flash, 0.36);
+      game.fusionMessage = "ritual de natureza";
+      game.fusionTimer = 2.1;
+      setEyeState("evolve", 1.1);
+      spawnEffect("sacredAnimalSheet", game.player.x, game.player.y - 20, 190, 1.35, rand(-0.2, 0.2));
+      burst(ritual.x, ritual.y, "#78ff5d", 42, 260);
+      sfx("level");
+    }
+  }
 }
 
 function updateParticles(dt) {
@@ -922,6 +964,9 @@ function cleanup() {
     if (enemy.hp <= 0) {
       dropXp(enemy.x, enemy.y, enemy.type.xp + (enemy.crystal ? 4 : 0), enemy.crystal);
       if (enemy.crystal && Math.random() < 0.72) dropSugar(enemy.x, enemy.y);
+      if ((enemy.crystal && Math.random() < 0.28) || (enemy.type.key === "debtClock" && Math.random() < 0.08)) {
+        dropRitual(enemy.x, enemy.y);
+      }
       spawnEffect(
         enemy.crystal ? "effectAscensionSheet" : Math.random() > 0.5 ? "effectExplosionSheet" : "effectSmokeSheet",
         enemy.x,
@@ -937,6 +982,7 @@ function cleanup() {
   game.bullets = game.bullets.filter((b) => b.life > 0 && b.x > -80 && b.x < WORLD.w + 80 && b.y > -80 && b.y < H + 80);
   game.xp = game.xp.filter((x) => x.life > 0);
   game.sugars = game.sugars.filter((s) => !s.dead);
+  game.rituals = game.rituals.filter((r) => !r.dead && r.life > 0);
   game.particles = game.particles.filter((p) => p.life > 0);
   game.effects = game.effects.filter((p) => p.life > 0);
   game.damageTexts = game.damageTexts.filter((t) => t.life > 0);
@@ -993,6 +1039,7 @@ function resetRun() {
   game.bullets.length = 0;
   game.xp.length = 0;
   game.sugars.length = 0;
+  game.rituals.length = 0;
   game.particles.length = 0;
   game.effects.length = 0;
   game.damageTexts.length = 0;
@@ -1205,7 +1252,9 @@ function drawEnemies() {
     ctx.rotate(enemy.rot);
     const img = images[enemy.type.key];
     const sheet =
-      enemy.type.key === "news"
+      enemy.type.sheet
+        ? images[enemy.type.sheet]
+        : enemy.type.key === "news"
         ? images.newsSheet
         : enemy.type.key === "cart"
           ? images.cartSheet
@@ -1214,7 +1263,7 @@ function drawEnemies() {
             : enemy.type.key === "bill"
               ? images.billSheet
               : null;
-    const animFrame = Math.floor(game.time * (enemy.type.key === "cart" || enemy.type.key === "notification" ? 12 : 10) + enemy.id) % 16;
+    const animFrame = Math.floor(game.time * (enemy.type.key === "cart" || enemy.type.key === "notification" || enemy.type.key === "doomscroll" ? 12 : 10) + enemy.id) % 16;
     const scaleHit = enemy.hit > 0 ? 1.16 : 1;
     const size = enemy.size * scaleHit;
     ctx.globalCompositeOperation = "lighter";
@@ -1227,7 +1276,7 @@ function drawEnemies() {
     ctx.globalAlpha = 1;
     if (sheet) {
       drawSheetFrame(sheet, animFrame, 0, 0, size * 1.08, 0);
-    } else {
+    } else if (img) {
       drawSprite(img, 0, 0, size, 0);
     }
     if (enemy.crystal) {
@@ -1276,6 +1325,22 @@ function drawDrops() {
     ctx.fill();
     ctx.globalCompositeOperation = "source-over";
     drawSheetFrame(images.sugarSheet, Math.floor(game.time * 13 + sugar.pulse) % 16, 0, 0, size * 1.15, 0);
+    ctx.restore();
+  }
+
+  for (const ritual of game.rituals) {
+    const frame = Math.floor(game.time * 12 + ritual.pulse) % 16;
+    const size = 42 + Math.sin(ritual.pulse) * 4;
+    ctx.save();
+    ctx.translate(ritual.x, ritual.y);
+    ctx.globalCompositeOperation = "lighter";
+    ctx.globalAlpha = 0.55;
+    ctx.fillStyle = "rgba(120,255,93,0.48)";
+    ctx.beginPath();
+    ctx.arc(0, 0, 34 + Math.sin(ritual.pulse * 1.3) * 8, 0, TAU);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    drawSheetFrame(images.mushroomSheet, frame, 0, 0, size, 0);
     ctx.restore();
   }
 }
