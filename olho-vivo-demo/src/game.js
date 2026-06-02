@@ -70,12 +70,12 @@ const STAGES = [
     name: "Avenida do Ruido",
     tint: "#ff4fd8",
     obstacles: [
-      { x: 360, y: 185, rx: 130, ry: 42, label: "engarrafamento" },
-      { x: 820, y: 560, rx: 112, ry: 46, label: "banca" },
-      { x: 1370, y: 170, rx: 86, ry: 42, label: "ponto" },
-      { x: 2100, y: 585, rx: 122, ry: 44, label: "placas" },
-      { x: 2760, y: 170, rx: 136, ry: 48, label: "carros" },
-      { x: 3260, y: 550, rx: 104, ry: 42, label: "cone" },
+      { x: 360, y: 185, rx: 130, ry: 42, label: "engarrafamento", type: "trafficCar" },
+      { x: 820, y: 560, rx: 112, ry: 46, label: "banca", type: "newsstand" },
+      { x: 1370, y: 170, rx: 86, ry: 42, label: "ilha de silencio", type: "silentTree" },
+      { x: 2100, y: 585, rx: 122, ry: 44, label: "semaforo quebrado", type: "brokenSignal" },
+      { x: 2760, y: 170, rx: 136, ry: 48, label: "carros", type: "trafficCar" },
+      { x: 3260, y: 550, rx: 104, ry: 42, label: "cone", type: "cone" },
     ],
   },
   {
@@ -117,6 +117,15 @@ const POWER_DEFS = {
 const POWER_KEYS = Object.keys(POWER_DEFS);
 const INTRO_NAMES = ["TRANSITO", "NOTICIAS", "CONSUMO", "BOLETOS", "BURNOUT", "BUROCRACIA"];
 const WAVE_PATTERNS = ["block", "worm", "sides", "swarm", "escort", "sugarLine"];
+
+const PROP_DEFS = {
+  trafficCar: { color: "#ff7a2f", accent: "#ffe96a", event: "horn", aura: "#ff7a2f" },
+  newsstand: { color: "#f2eadc", accent: "#ff4fd8", event: "spawnNews", aura: "#ff4fd8" },
+  silentTree: { color: "#78ff5d", accent: "#62f9ff", event: "silence", aura: "#78ff5d" },
+  brokenSignal: { color: "#ffe96a", accent: "#ff4f9d", event: "signal", aura: "#ffe96a" },
+  cone: { color: "#f7c85a", accent: "#ff7a2f", event: null, aura: "#ffe96a" },
+  generic: { color: "#62f9ff", accent: "#ff4fd8", event: null, aura: "#62f9ff" },
+};
 
 const bgStars = Array.from({ length: 280 }, (_, i) => ({
   x: (i * 197 + 41) % WORLD.w,
@@ -179,6 +188,7 @@ const game = {
     { key: "prism", level: 1 },
     { key: "sigil", level: 1 },
   ],
+  propStates: {},
   player: {
     x: PLAYER_START.x,
     y: PLAYER_START.y,
@@ -195,6 +205,7 @@ const game = {
   particles: [],
   effects: [],
   afterimages: [],
+  hornWaves: [],
   damageTexts: [],
 };
 
@@ -306,6 +317,36 @@ function activeStage() {
   return STAGES[game.stageIndex];
 }
 
+function activeProps() {
+  return activeStage().obstacles || [];
+}
+
+function propType(prop) {
+  return prop.type || "generic";
+}
+
+function propDef(prop) {
+  return PROP_DEFS[propType(prop)] || PROP_DEFS.generic;
+}
+
+function propId(prop) {
+  return `${game.stageIndex}:${propType(prop)}:${Math.round(prop.x)}:${Math.round(prop.y)}`;
+}
+
+function propState(prop) {
+  const id = propId(prop);
+  if (!game.propStates[id]) {
+    game.propStates[id] = {
+      cooldown: rand(1.5, 4.8),
+      contact: 0,
+      purified: 0,
+      activity: 0,
+      bumpCooldown: 0,
+    };
+  }
+  return game.propStates[id];
+}
+
 function powerLevel(key) {
   return game.powers.find((power) => power.key === key)?.level || 0;
 }
@@ -411,6 +452,19 @@ function spawnAfterimage(x, y, rotation, size = 82, life = 0.38) {
     life,
     maxLife: life,
     frameOffset: Math.floor(rand(0, 5)),
+  });
+}
+
+function spawnHornWave(prop) {
+  game.hornWaves.push({
+    x: prop.x,
+    y: prop.y,
+    r: Math.max(prop.rx, prop.ry) * 0.55,
+    maxR: Math.max(prop.rx, prop.ry) + 210,
+    life: 1.45,
+    maxLife: 1.45,
+    color: propDef(prop).accent,
+    hitPlayer: false,
   });
 }
 
@@ -596,24 +650,41 @@ function dropRitual(x, y) {
 }
 
 function resolvePlayerObstacles() {
-  for (const obstacle of activeStage().obstacles) {
-    const dx = game.player.x - obstacle.x;
-    const dy = game.player.y - obstacle.y;
-    const rx = obstacle.rx + game.player.radius;
-    const ry = obstacle.ry + game.player.radius;
+  for (const prop of activeProps()) {
+    const dx = game.player.x - prop.x;
+    const dy = game.player.y - prop.y;
+    const rx = prop.rx + game.player.radius;
+    const ry = prop.ry + game.player.radius;
     const nx = dx / rx;
     const ny = dy / ry;
     const inside = nx * nx + ny * ny;
     if (inside > 0 && inside < 1) {
+      const state = propState(prop);
+      const def = propDef(prop);
       const angle = Math.atan2(ny, nx);
       const targetX = Math.cos(angle) * rx;
       const targetY = Math.sin(angle) * ry;
-      game.player.x = obstacle.x + targetX;
-      game.player.y = obstacle.y + targetY;
+      game.player.x = prop.x + targetX;
+      game.player.y = prop.y + targetY;
       game.player.vx *= 0.32;
       game.player.vy *= 0.32;
-      if (game.player.invuln <= 0.05) {
-        burst(game.player.x, game.player.y, activeStage().tint, 3, 45);
+      state.contact = 0.45;
+      if (state.bumpCooldown <= 0) {
+        const cx = prop.x + Math.cos(angle) * prop.rx;
+        const cy = prop.y + Math.sin(angle) * prop.ry;
+        spawnEffect("contactSparkSheet", cx, cy, 54, 0.32, angle);
+        burst(cx, cy, def.aura, 4, 80);
+        state.bumpCooldown = 0.28;
+      }
+      if (propType(prop) === "silentTree" && state.cooldown <= 0) {
+        state.cooldown = 18;
+        state.purified = 4.5;
+        game.focus = Math.min(1, game.focus + 0.16);
+        game.sugar = Math.max(0, game.sugar - 1);
+        game.fusionMessage = "ilha de silencio";
+        game.fusionTimer = 2;
+        spawnEffect("sacredAnimalSheet", prop.x, prop.y - 22, 170, 1.1);
+        burst(prop.x, prop.y, "#78ff5d", 34, 220);
       }
     }
   }
@@ -728,6 +799,7 @@ function update(dt) {
     game.fusionTimer = Math.max(0, game.fusionTimer - dt);
     updateParticles(dt);
     updateEffects(dt);
+    updateAfterimages(dt);
     return;
   }
 
@@ -764,6 +836,8 @@ function update(dt) {
   game.player.y = clamp(game.player.y + game.player.vy * dt, 72, H - 48);
   resolvePlayerObstacles();
   game.cameraX += (cameraTargetX() - game.cameraX) * Math.min(1, dt * 8);
+  updateSceneProps(dt);
+  updateHornWaves(dt);
 
   game.waveTimer -= dt;
   if (game.waveTimer <= 0 || game.enemies.length < 5) {
@@ -830,6 +904,68 @@ function updateIntro(dt) {
     burst(W * 0.5 + Math.cos(a) * r, H * 0.52 + Math.sin(a) * r * 0.65, ["#ff4fd8", "#62f9ff", "#78ff5d", "#ffe96a"][Math.floor(rand(0, 4))], 1, 170);
   }
   if (game.introTime >= game.introDuration) beginRun();
+}
+
+function updateSceneProps(dt) {
+  for (const prop of activeProps()) {
+    const state = propState(prop);
+    const type = propType(prop);
+    state.cooldown = Math.max(0, state.cooldown - dt);
+    state.contact = Math.max(0, state.contact - dt * 2.4);
+    state.purified = Math.max(0, state.purified - dt);
+    state.activity = Math.max(0, state.activity - dt * 1.8);
+    state.bumpCooldown = Math.max(0, state.bumpCooldown - dt);
+
+    if (game.stageIndex !== 0 || state.purified > 0) continue;
+    const playerDistance = Math.hypot(game.player.x - prop.x, game.player.y - prop.y);
+    if (type === "newsstand" && playerDistance < 760 && state.cooldown <= 0 && game.enemies.length < 70) {
+      spawnEnemyAt(prop.x + rand(-80, 80), prop.y - prop.ry - 28, false, Math.random() > 0.5 ? "news" : "doomscroll", { waveGlow: 0.9 });
+      spawnEffect("contactSparkSheet", prop.x, prop.y - prop.ry, 72, 0.45, rand(-0.4, 0.4));
+      state.activity = 1;
+      state.cooldown = rand(8, 13);
+    }
+    if (type === "trafficCar" && playerDistance < 640 && state.cooldown <= 0) {
+      spawnHornWave(prop);
+      state.activity = 1;
+      state.cooldown = rand(7, 11);
+    }
+    if (type === "brokenSignal" && playerDistance < 700 && state.cooldown <= 0 && game.enemies.length < 72) {
+      for (let i = 0; i < 3; i++) {
+        spawnEnemyAt(prop.x + rand(-110, 110), prop.y - prop.ry - rand(20, 80), false, i === 0 ? "notification" : "doomscroll", { waveGlow: 0.75 });
+      }
+      state.activity = 1;
+      state.cooldown = rand(10, 15);
+    }
+  }
+}
+
+function updateHornWaves(dt) {
+  for (const wave of game.hornWaves) {
+    wave.life -= dt;
+    wave.r += dt * 210;
+    const dPlayer = Math.hypot(game.player.x - wave.x, game.player.y - wave.y);
+    if (!wave.hitPlayer && Math.abs(dPlayer - wave.r) < 24) {
+      const a = Math.atan2(game.player.y - wave.y, game.player.x - wave.x);
+      game.player.x = clamp(game.player.x + Math.cos(a) * 32, 42, WORLD.w - 42);
+      game.player.y = clamp(game.player.y + Math.sin(a) * 22, 72, H - 48);
+      game.player.vx += Math.cos(a) * 90;
+      game.player.vy += Math.sin(a) * 70;
+      game.shake = Math.max(game.shake, 5);
+      spawnEffect("contactSparkSheet", game.player.x, game.player.y, 62, 0.34, a);
+      wave.hitPlayer = true;
+    }
+    for (const enemy of game.enemies) {
+      const d = Math.hypot(enemy.x - wave.x, enemy.y - wave.y);
+      if (Math.abs(d - wave.r) < enemy.radius + 18) {
+        const a = Math.atan2(enemy.y - wave.y, enemy.x - wave.x);
+        enemy.x += Math.cos(a) * 42 * dt;
+        enemy.y += Math.sin(a) * 34 * dt;
+        enemy.hp -= 0.15 * dt;
+        enemy.hit = Math.max(enemy.hit, 0.08);
+      }
+    }
+  }
+  game.hornWaves = game.hornWaves.filter((wave) => wave.life > 0 && wave.r < wave.maxR);
 }
 
 function updateEnemies(dt) {
@@ -1084,6 +1220,8 @@ function resetRun() {
   game.particles.length = 0;
   game.effects.length = 0;
   game.afterimages.length = 0;
+  game.hornWaves.length = 0;
+  game.propStates = {};
   game.damageTexts.length = 0;
 }
 
@@ -1113,14 +1251,18 @@ function draw() {
   drawBackground();
   ctx.save();
   ctx.translate(-game.cameraX, 0);
+  drawSceneProps(false);
+  drawHornWaves();
   drawDrops();
   drawEnemies();
-  drawObstacles();
+  drawCollisionAuras();
+  drawPlayerShadow();
   drawPowersBehind();
   drawAfterimages();
   drawPlayer();
   drawBullets();
   drawEffects();
+  drawSceneProps(true);
   drawParticles();
   ctx.restore();
   drawUi();
@@ -1247,26 +1389,169 @@ function drawBackground() {
   ctx.restore();
 }
 
-function drawObstacles() {
-  const stage = activeStage();
+function drawSceneProps(front = false) {
+  ctx.save();
+  for (const prop of activeProps()) {
+    if (prop.x + prop.rx < game.cameraX - 180 || prop.x - prop.rx > game.cameraX + W + 180) continue;
+    const isFront = prop.y > game.player.y + 6;
+    if (front !== isFront) continue;
+    drawSceneProp(prop);
+  }
+  ctx.restore();
+}
+
+function drawSceneProp(prop) {
+  const def = propDef(prop);
+  const state = propState(prop);
+  const type = propType(prop);
+  const activity = state.activity + state.contact + state.purified * 0.12;
+  ctx.save();
+  ctx.translate(prop.x, prop.y);
+  ctx.globalCompositeOperation = "source-over";
+  ctx.globalAlpha = state.purified > 0 ? 0.72 : 0.9;
+
+  ctx.fillStyle = "rgba(0,0,0,0.28)";
+  ctx.beginPath();
+  ctx.ellipse(0, prop.ry * 0.45, prop.rx * 0.94, prop.ry * 0.46, 0, 0, TAU);
+  ctx.fill();
+
+  ctx.globalCompositeOperation = "lighter";
+  ctx.globalAlpha = 0.12 + activity * 0.16;
+  ctx.fillStyle = def.aura;
+  ctx.beginPath();
+  ctx.ellipse(0, 0, prop.rx * 0.88, prop.ry * 0.72, 0, 0, TAU);
+  ctx.fill();
+  ctx.globalCompositeOperation = "source-over";
+  ctx.globalAlpha = 1;
+
+  if (type === "trafficCar") {
+    drawTrafficCarProp(prop, def, state);
+  } else if (type === "newsstand") {
+    drawNewsstandProp(prop, def, state);
+  } else if (type === "silentTree") {
+    drawSilentTreeProp(prop, def, state);
+  } else if (type === "brokenSignal") {
+    drawBrokenSignalProp(prop, def, state);
+  } else {
+    drawConeProp(prop, def, state);
+  }
+  ctx.restore();
+}
+
+function drawTrafficCarProp(prop, def, state) {
+  const wobble = Math.sin(game.time * 12 + prop.x) * (state.activity > 0 ? 3 : 0.8);
+  ctx.save();
+  ctx.rotate(wobble * 0.012);
+  ctx.fillStyle = "rgba(18,12,34,0.86)";
+  ctx.fillRect(-prop.rx * 0.62, -prop.ry * 0.48, prop.rx * 1.24, prop.ry * 0.82);
+  ctx.fillStyle = def.color;
+  ctx.fillRect(-prop.rx * 0.48, -prop.ry * 0.34, prop.rx * 0.96, prop.ry * 0.38);
+  ctx.fillStyle = def.accent;
+  ctx.fillRect(-prop.rx * 0.34, -prop.ry * 0.46, prop.rx * 0.24, prop.ry * 0.18);
+  ctx.fillRect(prop.rx * 0.1, -prop.ry * 0.46, prop.rx * 0.24, prop.ry * 0.18);
+  ctx.fillStyle = "rgba(0,0,0,0.78)";
+  ctx.beginPath();
+  ctx.arc(-prop.rx * 0.42, prop.ry * 0.35, 8, 0, TAU);
+  ctx.arc(prop.rx * 0.42, prop.ry * 0.35, 8, 0, TAU);
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawNewsstandProp(prop, def, state) {
+  ctx.fillStyle = "rgba(13,10,28,0.9)";
+  ctx.fillRect(-prop.rx * 0.52, -prop.ry * 0.52, prop.rx * 1.04, prop.ry * 0.94);
+  ctx.fillStyle = def.color;
+  ctx.fillRect(-prop.rx * 0.42, -prop.ry * 0.28, prop.rx * 0.84, prop.ry * 0.18);
+  ctx.fillStyle = def.accent;
+  for (let i = 0; i < 5; i++) {
+    const x = -prop.rx * 0.38 + i * prop.rx * 0.19;
+    ctx.fillRect(x, -prop.ry * 0.05 + Math.sin(game.time * 5 + i) * 2, prop.rx * 0.12, prop.ry * 0.26);
+  }
+  ctx.globalCompositeOperation = "lighter";
+  ctx.globalAlpha = 0.4 + state.activity * 0.45;
+  drawSheetFrame(images.contactSparkSheet, Math.floor(game.time * 10) % 16, 0, -prop.ry * 0.62, 52, 0);
+}
+
+function drawSilentTreeProp(prop, def, state) {
+  ctx.globalCompositeOperation = "lighter";
+  ctx.globalAlpha = 0.32 + (state.purified > 0 ? 0.35 : 0);
+  drawSheetFrame(images.mushroomSheet, Math.floor(game.time * 8) % 16, 0, 0, prop.rx * 1.1, 0);
+  ctx.globalAlpha = 1;
+  ctx.strokeStyle = def.color;
+  ctx.lineWidth = 2;
+  drawMandala(0, 0, prop.rx * 0.42, game.time * 0.25);
+}
+
+function drawBrokenSignalProp(prop, def, state) {
+  ctx.strokeStyle = "rgba(249,251,255,0.45)";
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(0, prop.ry * 0.52);
+  ctx.lineTo(0, -prop.ry * 0.58);
+  ctx.stroke();
+  for (let i = 0; i < 3; i++) {
+    ctx.fillStyle = i === 0 ? "#ff4f57" : i === 1 ? def.accent : "#78ff5d";
+    ctx.globalAlpha = 0.3 + (Math.sin(game.time * 5 + i * 1.7) > 0.25 ? 0.5 : 0);
+    ctx.beginPath();
+    ctx.arc(0, -prop.ry * 0.45 + i * prop.ry * 0.34, 11, 0, TAU);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+}
+
+function drawConeProp(prop, def) {
+  ctx.fillStyle = def.color;
+  ctx.beginPath();
+  ctx.moveTo(0, -prop.ry * 0.62);
+  ctx.lineTo(prop.rx * 0.45, prop.ry * 0.5);
+  ctx.lineTo(-prop.rx * 0.45, prop.ry * 0.5);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = def.accent;
+  ctx.fillRect(-prop.rx * 0.26, -prop.ry * 0.06, prop.rx * 0.52, prop.ry * 0.14);
+}
+
+function drawCollisionAuras() {
   ctx.save();
   ctx.globalCompositeOperation = "lighter";
-  for (const obstacle of stage.obstacles) {
-    if (obstacle.x + obstacle.rx < game.cameraX - 120 || obstacle.x - obstacle.rx > game.cameraX + W + 120) continue;
-    const pulse = 0.65 + Math.sin(game.time * 2 + obstacle.x) * 0.18;
-    ctx.globalAlpha = 0.045;
-    ctx.fillStyle = stage.tint;
+  for (const prop of activeProps()) {
+    if (prop.x + prop.rx < game.cameraX - 160 || prop.x - prop.rx > game.cameraX + W + 160) continue;
+    const state = propState(prop);
+    const def = propDef(prop);
+    const near = clamp(1 - Math.hypot(game.player.x - prop.x, game.player.y - prop.y) / 260, 0, 1);
+    const alpha = near * 0.34 + state.contact * 0.5 + (state.purified > 0 ? 0.25 : 0);
+    if (alpha <= 0.02) continue;
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = def.aura;
+    ctx.lineWidth = 1.5 + state.contact * 3;
+    ctx.setLineDash([5, 9]);
     ctx.beginPath();
-    ctx.ellipse(obstacle.x, obstacle.y, obstacle.rx, obstacle.ry, 0, 0, TAU);
-    ctx.fill();
-    ctx.globalAlpha = pulse * 0.22;
-    ctx.strokeStyle = stage.tint;
-    ctx.lineWidth = 1.5;
-    ctx.setLineDash([8, 12]);
-    ctx.beginPath();
-    ctx.ellipse(obstacle.x, obstacle.y, obstacle.rx + 6, obstacle.ry + 4, 0, 0, TAU);
+    ctx.ellipse(prop.x, prop.y, prop.rx + 8 + state.contact * 8, prop.ry + 6 + state.contact * 6, 0, 0, TAU);
     ctx.stroke();
     ctx.setLineDash([]);
+    if (near > 0.2 || state.contact > 0) {
+      drawSheetFrame(images.causticOrbitSheet, Math.floor(game.time * 10 + prop.x) % 16, prop.x, prop.y, Math.max(prop.rx, prop.ry) * 1.25, game.time * 0.18);
+    }
+  }
+  ctx.restore();
+}
+
+function drawHornWaves() {
+  ctx.save();
+  ctx.globalCompositeOperation = "lighter";
+  for (const wave of game.hornWaves) {
+    const a = clamp(wave.life / wave.maxLife, 0, 1);
+    ctx.globalAlpha = a * 0.36;
+    ctx.strokeStyle = wave.color;
+    ctx.lineWidth = 2 + a * 2;
+    ctx.beginPath();
+    ctx.ellipse(wave.x, wave.y, wave.r, wave.r * 0.46, 0, 0, TAU);
+    ctx.stroke();
+    ctx.globalAlpha = a * 0.12;
+    ctx.fillStyle = wave.color;
+    ctx.beginPath();
+    ctx.ellipse(wave.x, wave.y, wave.r, wave.r * 0.46, 0, 0, TAU);
+    ctx.fill();
   }
   ctx.restore();
 }
@@ -1449,6 +1734,29 @@ function drawAfterimages() {
     drawSheetFrame(images.prismAfterimageSheet, frame, image.x, image.y, image.size, image.rotation);
     ctx.restore();
   }
+}
+
+function drawPlayerShadow() {
+  const p = game.player;
+  const speed = Math.hypot(p.vx, p.vy);
+  const stretch = clamp(speed / 260, 0, 0.65);
+  const rot = Math.atan2(p.vy, p.vx || 1);
+  ctx.save();
+  ctx.translate(p.x, p.y + 18);
+  ctx.rotate(rot);
+  ctx.globalCompositeOperation = "source-over";
+  ctx.globalAlpha = 0.2 + game.damagePulse * 0.12;
+  ctx.fillStyle = game.damagePulse > 0 ? "rgba(255,35,90,0.42)" : "rgba(0,0,0,0.72)";
+  ctx.beginPath();
+  ctx.ellipse(0, 0, 24 + game.sugar * 4 + stretch * 20, 9 + game.sugar * 1.5, 0, 0, TAU);
+  ctx.fill();
+  ctx.globalCompositeOperation = "lighter";
+  ctx.globalAlpha = 0.08 + p.invuln * 0.08;
+  ctx.fillStyle = p.invuln > 0 ? "rgba(98,249,255,0.6)" : "rgba(255,79,216,0.45)";
+  ctx.beginPath();
+  ctx.ellipse(0, 0, 32 + stretch * 24, 12, 0, 0, TAU);
+  ctx.fill();
+  ctx.restore();
 }
 
 function drawLeaf(x, y, rot) {
