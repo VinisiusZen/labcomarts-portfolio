@@ -1,4 +1,4 @@
-const CONFIG = {
+﻿const CONFIG = {
   frame: {
     columns: 7,
     rows: 4,
@@ -16,7 +16,7 @@ const CONFIG = {
   phases: {
     filhote: {
       label: "FILHOTE",
-      folder: "assets/sprites_aligned/filhote",
+      folder: "assets/sprites_polished/filhote",
       sprites: {
         idle: "kitty_idle_7x4.png",
         walk: "kitty_walk_6x4.png",
@@ -37,14 +37,14 @@ const CONFIG = {
     },
     adulto: {
       label: "ADULTO",
-      folder: "assets/sprites_aligned/adulto",
+      folder: "assets/sprites_polished/adulto",
       sprites: {
         idle: "adult_idle_6x4.png",
         walk: "adult_walk_6x4.png",
-        run: "adult_run_6x4.png",
-        jump: "adult_jump_6x4.png",
+        run: "adult_run_5x4.png",
+        jump: "adult_jump_7x4.png",
         attack: "adult_attack_6x4.png",
-        down: "adult_down_6x4.png",
+        down: "adult_down_7x4.png",
         getting_up: "adult_getting_up_6x4.png",
         licking_fur: "adult_licking_fur_6x4.png",
       },
@@ -58,7 +58,7 @@ const CONFIG = {
     },
     idoso: {
       label: "IDOSO",
-      folder: "assets/sprites_aligned/idoso",
+      folder: "assets/sprites_polished/idoso",
       sprites: {
         idle: "old_idle_6x4.png",
         walk: "old_walk_6x4.png",
@@ -138,11 +138,11 @@ const BEATS = [
     id: "beat01",
     title: "O abrigo",
     subtitle: "Antes do mundo ser grande demais.",
-    emotionalFunction: "Segurança, fragilidade e primeiro impulso de curiosidade.",
-    gameplayMeaning: "Botão Corpo mexe, engatinha e tenta levantar. Botão Voz mia baixo e chama a mãe.",
-    soundDirection: "Respiração da mãe, miados suaves, tecido, caixa, ruído distante da rua.",
+    emotionalFunction: "SeguranÃ§a, fragilidade e primeiro impulso de curiosidade.",
+    gameplayMeaning: "BotÃ£o Corpo mexe, engatinha e tenta levantar. BotÃ£o Voz mia baixo e chama a mÃ£e.",
+    soundDirection: "RespiraÃ§Ã£o da mÃ£e, miados suaves, tecido, caixa, ruÃ­do distante da rua.",
     textBox:
-      "O filhote ainda está perto da mãe. O som é abafado, quente, quase seguro. Cada pequeno movimento é uma descoberta: levantar a cabeça, mexer as orelhas, sentir a luz. O botão ainda não significa fuga. Significa existir.",
+      "O filhote ainda estÃ¡ perto da mÃ£e. O som Ã© abafado, quente, quase seguro. Cada pequeno movimento Ã© uma descoberta: levantar a cabeÃ§a, mexer as orelhas, sentir a luz. O botÃ£o ainda nÃ£o significa fuga. Significa existir.",
     assetFolder: "assets/beats_aligned/beat01",
     files: beatSheetFiles(1),
     defaultFps: 10,
@@ -154,10 +154,10 @@ const BEATS = [
     title: "Primeiros passos",
     subtitle: "O primeiro rompimento.",
     emotionalFunction: "Curiosidade misturada com ansiedade.",
-    gameplayMeaning: "Botão Corpo anda e tropeça. Botão Voz chama a mãe ou hesita.",
-    soundDirection: "Passinhos leves, miado curto, ambiente abrindo, chamado distante da mãe.",
+    gameplayMeaning: "BotÃ£o Corpo anda e tropeÃ§a. BotÃ£o Voz chama a mÃ£e ou hesita.",
+    soundDirection: "Passinhos leves, miado curto, ambiente abrindo, chamado distante da mÃ£e.",
     textBox:
-      "Ele começa a se afastar. Ainda tropeça, ainda olha para trás, ainda espera que a mãe esteja ali. Mas a curiosidade empurra mais forte que o medo. A cada passo, o abrigo fica menor.",
+      "Ele comeÃ§a a se afastar. Ainda tropeÃ§a, ainda olha para trÃ¡s, ainda espera que a mÃ£e esteja ali. Mas a curiosidade empurra mais forte que o medo. A cada passo, o abrigo fica menor.",
     assetFolder: "assets/beats_aligned/beat02",
     files: beatSheetFiles(2),
     defaultFps: 10,
@@ -169,10 +169,10 @@ const BEATS = [
     title: "O limiar",
     subtitle: "A linha entre colo e mundo.",
     emotionalFunction: "Medo e maravilhamento.",
-    gameplayMeaning: "Botão Corpo avança. Botão Voz chama, hesita ou pede segurança.",
-    soundDirection: "Vento, rua entrando, grave baixo de tensão, mudança de ambiência.",
+    gameplayMeaning: "BotÃ£o Corpo avanÃ§a. BotÃ£o Voz chama, hesita ou pede seguranÃ§a.",
+    soundDirection: "Vento, rua entrando, grave baixo de tensÃ£o, mudanÃ§a de ambiÃªncia.",
     textBox:
-      "Na saída do abrigo, a luz bate forte. O mundo entra de uma vez: vento, ruído, cheiro de rua. O filhote recua por um instante. Depois decide. Um passo para fora não parece muito, mas é a primeira grande travessia da vida.",
+      "Na saÃ­da do abrigo, a luz bate forte. O mundo entra de uma vez: vento, ruÃ­do, cheiro de rua. O filhote recua por um instante. Depois decide. Um passo para fora nÃ£o parece muito, mas Ã© a primeira grande travessia da vida.",
     assetFolder: "assets/beats_aligned/beat03",
     files: beatSheetFiles(3),
     defaultFps: 10,
@@ -182,12 +182,12 @@ const BEATS = [
   {
     id: "beat04",
     title: "O susto",
-    subtitle: "A curiosidade vira sobrevivência.",
-    emotionalFunction: "Ruptura, pânico e instinto.",
-    gameplayMeaning: "Botão Corpo corre e esquiva. Botão Voz solta miados de pânico e ajuda a controlar o medo.",
-    soundDirection: "Latido, estalo brusco, respiração curta, coração acelerando, patas raspando.",
+    subtitle: "A curiosidade vira sobrevivÃªncia.",
+    emotionalFunction: "Ruptura, pÃ¢nico e instinto.",
+    gameplayMeaning: "BotÃ£o Corpo corre e esquiva. BotÃ£o Voz solta miados de pÃ¢nico e ajuda a controlar o medo.",
+    soundDirection: "Latido, estalo brusco, respiraÃ§Ã£o curta, coraÃ§Ã£o acelerando, patas raspando.",
     textBox:
-      "Um barulho corta tudo. O corpo encolhe antes de entender. O coração dispara. O filhote salta, gira e corre. A brincadeira acabou. Agora o botão não é mais descoberta. É fuga.",
+      "Um barulho corta tudo. O corpo encolhe antes de entender. O coraÃ§Ã£o dispara. O filhote salta, gira e corre. A brincadeira acabou. Agora o botÃ£o nÃ£o Ã© mais descoberta. Ã‰ fuga.",
     assetFolder: "assets/beats_aligned/beat04",
     files: beatSheetFiles(4),
     defaultFps: 12,
@@ -198,11 +198,11 @@ const BEATS = [
     id: "beat05",
     title: "A rua",
     subtitle: "O mundo grande demais.",
-    emotionalFunction: "Trauma, confusão e vulnerabilidade.",
-    gameplayMeaning: "Botão Corpo tenta levantar e se equilibrar. Botão Voz respira, mia e tenta estabilizar o coração.",
-    soundDirection: "Freada, buzina, pancada abafada, coração no HUD, respiração ofegante.",
+    emotionalFunction: "Trauma, confusÃ£o e vulnerabilidade.",
+    gameplayMeaning: "BotÃ£o Corpo tenta levantar e se equilibrar. BotÃ£o Voz respira, mia e tenta estabilizar o coraÃ§Ã£o.",
+    soundDirection: "Freada, buzina, pancada abafada, coraÃ§Ã£o no HUD, respiraÃ§Ã£o ofegante.",
     textBox:
-      "A corrida quebra. Luzes passam rápido demais. Um freio, uma buzina, um impacto que talvez tenha sido quase, talvez tenha sido real. O filhote derrapa, perde o eixo e cai. Ele tenta levantar, mas o mundo gira.",
+      "A corrida quebra. Luzes passam rÃ¡pido demais. Um freio, uma buzina, um impacto que talvez tenha sido quase, talvez tenha sido real. O filhote derrapa, perde o eixo e cai. Ele tenta levantar, mas o mundo gira.",
     assetFolder: "assets/beats_aligned/beat05",
     files: beatSheetFiles(5),
     defaultFps: 11,
@@ -213,11 +213,11 @@ const BEATS = [
     id: "beat06",
     title: "A chuva",
     subtitle: "A rua vira rio.",
-    emotionalFunction: "Impotência e sobrevivência física.",
-    gameplayMeaning: "Botão Corpo tenta firmar as patas e nadar. Botão Voz mia por ajuda e marca a respiração.",
-    soundDirection: "Chuva forte, água correndo, sarjeta, miados aflitos.",
+    emotionalFunction: "ImpotÃªncia e sobrevivÃªncia fÃ­sica.",
+    gameplayMeaning: "BotÃ£o Corpo tenta firmar as patas e nadar. BotÃ£o Voz mia por ajuda e marca a respiraÃ§Ã£o.",
+    soundDirection: "Chuva forte, Ã¡gua correndo, sarjeta, miados aflitos.",
     textBox:
-      "A água chega primeiro como poça. Depois como força. As patas escorregam. O corpo tenta resistir, mas a correnteza puxa. O filhote ainda luta, mas já não escolhe a direção.",
+      "A Ã¡gua chega primeiro como poÃ§a. Depois como forÃ§a. As patas escorregam. O corpo tenta resistir, mas a correnteza puxa. O filhote ainda luta, mas jÃ¡ nÃ£o escolhe a direÃ§Ã£o.",
     assetFolder: "assets/beats_aligned/beat06",
     files: beatSheetFiles(6),
     defaultFps: 11,
@@ -228,11 +228,11 @@ const BEATS = [
     id: "beat07",
     title: "O bueiro",
     subtitle: "Quase sumir.",
-    emotionalFunction: "Ponto mais escuro da sequência; quase morte.",
-    gameplayMeaning: "Botão Corpo nada desesperadamente. Botão Voz tenta respirar, miar e manter consciência.",
-    soundDirection: "Correnteza forte, eco metálico do bueiro, respiração cortada, água engolindo, tensão máxima.",
+    emotionalFunction: "Ponto mais escuro da sequÃªncia; quase morte.",
+    gameplayMeaning: "BotÃ£o Corpo nada desesperadamente. BotÃ£o Voz tenta respirar, miar e manter consciÃªncia.",
+    soundDirection: "Correnteza forte, eco metÃ¡lico do bueiro, respiraÃ§Ã£o cortada, Ã¡gua engolindo, tensÃ£o mÃ¡xima.",
     textBox:
-      "A correnteza gira. A cabeça entra e sai da água. O ar falta. O bueiro aparece como uma boca escura, puxando tudo. O filhote bate as patas sem ritmo, sem força, só insistindo em não desaparecer.",
+      "A correnteza gira. A cabeÃ§a entra e sai da Ã¡gua. O ar falta. O bueiro aparece como uma boca escura, puxando tudo. O filhote bate as patas sem ritmo, sem forÃ§a, sÃ³ insistindo em nÃ£o desaparecer.",
     assetFolder: "assets/beats_aligned/beat07",
     files: beatSheetFiles(7),
     defaultFps: 12,
@@ -243,11 +243,11 @@ const BEATS = [
     id: "beat08",
     title: "O resgate",
     subtitle: "Ainda vivo.",
-    emotionalFunction: "Liberação, alívio e sobrevivência.",
-    gameplayMeaning: "Botão Corpo dá o último impulso. Botão Voz chama, respira e confirma que ainda há vida.",
-    soundDirection: "Roda de bicicleta, splash, ruído metálico, tecido ou mão resgatando, respiração aliviada, música abrindo.",
+    emotionalFunction: "LiberaÃ§Ã£o, alÃ­vio e sobrevivÃªncia.",
+    gameplayMeaning: "BotÃ£o Corpo dÃ¡ o Ãºltimo impulso. BotÃ£o Voz chama, respira e confirma que ainda hÃ¡ vida.",
+    soundDirection: "Roda de bicicleta, splash, ruÃ­do metÃ¡lico, tecido ou mÃ£o resgatando, respiraÃ§Ã£o aliviada, mÃºsica abrindo.",
     textBox:
-      "Algo muda no fluxo. Uma roda, uma luz, uma intervenção. O filhote reage com o pouco que resta. Um último impulso, um splash diferente, e a água deixa de vencer. Ele termina encharcado, exausto, tremendo — mas vivo.",
+      "Algo muda no fluxo. Uma roda, uma luz, uma intervenÃ§Ã£o. O filhote reage com o pouco que resta. Um Ãºltimo impulso, um splash diferente, e a Ã¡gua deixa de vencer. Ele termina encharcado, exausto, tremendo â€” mas vivo.",
     assetFolder: "assets/beats_aligned/beat08",
     files: beatSheetFiles(8),
     defaultFps: 10,
@@ -496,7 +496,7 @@ class SpriteAnimator {
     this.holdLastFrame = holdLastFrame;
     this.phase = phase;
     this.state = state;
-    this.anchorMode = "frame";
+    this.anchorMode = "stable";
     this.currentFrame = 0;
     this.elapsed = 0;
     this.finished = false;
@@ -906,7 +906,7 @@ function cleanCheckerboard(image, file) {
     offCtx.putImageData(imageData, 0, 0);
     return offscreen;
   } catch (error) {
-    warnings.push(`Não foi possível limpar checkerboard em ${file}.`);
+    warnings.push(`NÃ£o foi possÃ­vel limpar checkerboard em ${file}.`);
     return image;
   }
 }
@@ -3174,3 +3174,4 @@ function start() {
 }
 
 start();
+

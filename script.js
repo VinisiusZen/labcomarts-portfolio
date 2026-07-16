@@ -3,6 +3,92 @@ const thumb = (number) => `./assets/work/thumbs/slide-${String(number).padStart(
 
 const projects = [
   {
+    id: "vinisius-portfolio-reel",
+    number: "REEL",
+    title: "Creative Direction Reel",
+    compactTitle: true,
+    category: "Kinetic typography / AI workflow hero film",
+    role: "Direcao criativa, narrativa, motion system e Remotion build",
+    tools: "Remotion, React, kinetic typography, CSS masks, procedural mattes e AI-assisted direction",
+    year: "2026",
+    hero: "./assets/reel/vinisius-portfolio-reel-poster.png",
+    video: "./assets/reel/vinisius-portfolio-reel-web.mp4",
+    slides: [],
+    customGallery: ["./assets/reel/vinisius-portfolio-reel-poster.png"],
+    tags: [
+      "Creative Director reel",
+      "Kinetic typography",
+      "AI-assisted workflows",
+      "Motion design system",
+      "Campaign positioning",
+      "International portfolio"
+    ],
+    summary:
+      "Filme hero de 60 segundos que posiciona Vinisius Zen como Creative Director entre craft visual, estrategia, campanhas, sistemas visuais e workflows com IA.",
+    challenge:
+      "Transformar o posicionamento do portfolio em uma abertura premium, com autoridade criativa e energia de case film, sem parecer template de motion ou demonstracao generica de IA.",
+    solution:
+      "A peca usa tipografia cinetica, mattes procedurais, pre-lap entre beats, textura analogica, overlays tecnicos e uma curva narrativa que vai de caos criativo a assinatura profissional.",
+    highlights: [
+      "10 beats de narrativa visual para direcao criativa, lideranca, sistemas, AI workflows e craft humano.",
+      "Transicoes com pre-eco, impacto e settle para uma cena invadir a outra com sensacao fisica.",
+      "Arquitetura em Remotion com componentes reutilizaveis, dados de cena e mascaras procedurais.",
+      "Arquivo otimizado para web e integrado como hero reel do portfolio."
+    ]
+  },
+  {
+    id: "motion-3d-archive",
+    number: "MOTION",
+    title: "Motion & Technical Artist Archive",
+    compactTitle: true,
+    category: "3D motion / technical art / agency sales film",
+    role: "Direcao criativa, animacao, composicao, 3D, render e acabamento",
+    tools: "Cinema 4D, After Effects, Premiere, compositing, render pipeline e motion design",
+    year: "2019-2021",
+    hero: "./assets/motion-archive/artista-tecnico-poster.jpg",
+    video: "./assets/motion-archive/artista-tecnico-web.mp4",
+    slides: [],
+    customGallery: [
+      "./assets/motion-archive/artista-tecnico-poster.jpg",
+      "./assets/motion-archive/vinheta-poster.jpg"
+    ],
+    processVideos: [
+      {
+        label: "Artista tecnico - reel de processo e alta resolucao",
+        src: "./assets/motion-archive/artista-tecnico-web.mp4",
+        poster: "./assets/motion-archive/artista-tecnico-poster.jpg"
+      },
+      {
+        label: "Vinheta - assinatura motion curta",
+        src: "./assets/motion-archive/vinheta-web.mp4",
+        poster: "./assets/motion-archive/vinheta-poster.jpg"
+      }
+    ],
+    tags: [
+      "3D motion design",
+      "Technical artist",
+      "High resolution render",
+      "Compositing",
+      "Agency pitch asset",
+      "Packshot mindset",
+      "Motion craft",
+      "Creative production"
+    ],
+    summary:
+      "Arquivo de animacoes usado para vender e demonstrar capacidade de producao 3D/motion para agencias, conectando direcao visual, pipeline tecnico e acabamento de render.",
+    challenge:
+      "Transformar capacidade tecnica em material comercial claro: mostrar que o trabalho nao era apenas animacao bonita, mas um processo confiavel para criar imagens, filmes e packshots em alta resolucao para marcas e agencias.",
+    solution:
+      "As pecas organizam o craft como prova de producao: render, composicao, timing, camera, acabamento e assinatura visual. O filme principal mostra o pensamento de artista tecnico; a vinheta funciona como exemplo curto de identidade em movimento.",
+    highlights: [
+      "Filmes otimizados para web a partir de masters locais preservados.",
+      "Narrativa de capacidade produtiva para vender jobs de 3D e motion para agencias.",
+      "Demonstracao de pipeline de render, composicao, camera, luz e acabamento.",
+      "Case complementar aos projetos de packshot, vacina 3D e AI-driven production.",
+      "Posicionamento util para vagas que pedem motion, 3D, social assets e producao visual de alta qualidade."
+    ]
+  },
+  {
     id: "ufo-aqui",
     number: "NEW",
     title: "UFO_AQUI",
@@ -46,15 +132,18 @@ const projects = [
   },
   {
     id: "vida-de-gato-wip",
-    number: "WIP",
-    title: "Vida de gato",
-    category: "Playable demo / game prototype",
-    role: "Direção criativa, game feel, sprites e animatic",
-    tools: "HTML5 Canvas, JavaScript, sprite sheets e GenAI",
+    number: "ATUAL",
+    title: "So Mais Um Miado",
+    category: "Video sprite test / playable game prototype",
+    role: "Direcao criativa, game feel, sprite pipeline e prototipo jogavel",
+    tools: "HTML5 Canvas, JavaScript, video-to-sprite pipeline, sprite sheets e GenAI",
     year: "Work in progress",
-    hero: "./assets/cat-wip/vida-de-gato-adulto-corrida.webp",
-    video: "./assets/cat-wip/vida-de-gato-wip-loop.mp4",
-    liveUrl: "./vida-de-gato-demo/",
+    hero: "./assets/cat-wip/video-sprite-stage-banner.png",
+    video: "",
+    liveUrl: "./video-sprite-test/",
+    liveLabel: "Testar stage atual",
+    archiveUrl: "./vida-de-gato-demo/",
+    archiveLabel: "Blog post passado",
     liveUrlEn: "./vida-de-gato-demo/en.html",
     codeUrl: "https://github.com/VinisiusZen/labcomarts-portfolio/tree/main/vida-de-gato-demo",
     tags: [
@@ -92,6 +181,7 @@ const projects = [
       (_, index) => `./assets/cat-wip/levels/stage_${String(index + 1).padStart(2, "0")}.webp`
     ),
     customGallery: [
+      "./assets/cat-wip/video-sprite-stage-banner.png",
       "./assets/cat-wip/vida-de-gato-filhote-abrigo.webp",
       "./assets/cat-wip/vida-de-gato-filhote-salto.webp",
       "./assets/cat-wip/vida-de-gato-adulto-corrida.webp",
@@ -101,17 +191,35 @@ const projects = [
       "./assets/cat-wip/vida-de-gato-animatic-ui.webp"
     ],
     summary:
-      "Work in progress de um demo jogável sobre a vida de um gato, com sprites, fases de vida, cenários urbanos e animatic.",
+      "Post atual: stage gabarito para testar sprites extraidos de video, com fundo removido, estados jogaveis e linhas de referencia para validar alinhamento.",
     challenge:
-      "Transformar uma ideia emocional em um protótipo jogável com leitura imediata: o gato precisa parecer vivo, vulnerável e responsivo, sem depender de uma produção completa de game ainda.",
+      "Testar se um video gerado por IA pode virar uma base consistente de sprites: o gato precisa manter registro, silhueta, alpha limpo e leitura de movimento antes de escalar o metodo para novos estados.",
     solution:
-      "O protótipo usa HTML5 Canvas, sprites por fase de vida, estados de animação, cenários em progressão, tela de animatic, frame checker, controles por teclado/toque e testes de vibração para investigar game feel.",
+      "O stage atual isola o personagem em um cenario gabarito 16:9, com idle, walk, run e startled mapeados do video, controles por teclado e painel tecnico para ajustar FPS, escala, bounds e ghost frame.",
     highlights: [
-      "Demo jogável em Canvas com fases filhote, adulto e idoso.",
-      "Sprites com estados de idle, run, jump, attack, down, getting up e grooming.",
-      "Animatic do Ato 1 para amarrar narrativa, ritmo e atmosfera.",
-      "Frame checker interno para revisar bounds, alpha e continuidade dos sprites.",
-      "Loop de gameplay capturado como material de WIP para portfolio."
+      "Stage atual publicado dentro do portfolio como teste jogavel.",
+      "Frames extraidos de video com fundo verde removido e sem mascara sobre o gato.",
+      "Estados idle, walk, run e attack/startled prontos para avaliacao.",
+      "Gabarito visual com linhas de limite para conferir deslocamento vertical e lateral.",
+      "Demo principal anterior preservada como blog post passado."
+    ],
+    devPosts: [
+      {
+        status: "Post atual",
+        title: "Video Sprite Test",
+        url: "./video-sprite-test/",
+        image: "./assets/cat-wip/video-sprite-stage-banner.png",
+        text:
+          "Stage gabarito para validar sprites extraidos de video: alpha, registro, escala, ghost frame e resposta por teclado."
+      },
+      {
+        status: "Blog post passado",
+        title: "Demo jogavel com fases do gato",
+        url: "./vida-de-gato-demo/",
+        image: "./assets/cat-wip/vida-de-gato-adulto-corrida.webp",
+        text:
+          "Versao anterior com fases filhote, adulto e idoso, animatic, frame checker, cenarios em sequencia, trilhas e controles."
+      }
     ]
   },
   {
@@ -615,7 +723,8 @@ function renderDetail() {
         ${
           project.liveUrl || project.codeUrl
             ? `<div class="project-actions">
-                ${project.liveUrl ? `<a class="button" href="${project.liveUrl}">Testar online</a>` : ""}
+                ${project.liveUrl ? `<a class="button" href="${project.liveUrl}">${project.liveLabel || "Testar online"}</a>` : ""}
+                ${project.archiveUrl ? `<a class="button secondary-button" href="${project.archiveUrl}">${project.archiveLabel || "Arquivo anterior"}</a>` : ""}
                 ${project.liveUrlEn ? `<a class="button secondary-button" href="${project.liveUrlEn}">English version</a>` : ""}
                 ${project.codeUrl ? `<a class="button secondary-button" href="${project.codeUrl}">Codigo</a>` : ""}
               </div>`
@@ -658,6 +767,31 @@ function renderDetail() {
             <ul>${project.highlights.map((item) => `<li>${item}</li>`).join("")}</ul>
           </aside>
         </div>
+
+        ${
+          project.devPosts
+            ? `<section class="process-module">
+                <div>
+                  <p class="eyebrow">Dev log</p>
+                  <h2>Atualizacao do prototipo em ordem de publicacao.</h2>
+                </div>
+                <div class="dev-log-grid">
+                  ${project.devPosts
+                    .map(
+                      (post) => `
+                        <a class="dev-post-card" href="${post.url}">
+                          <img src="${post.image}" alt="${post.title}" />
+                          <span>${post.status}</span>
+                          <strong>${post.title}</strong>
+                          <p>${post.text}</p>
+                        </a>
+                      `
+                    )
+                    .join("")}
+                </div>
+              </section>`
+            : ""
+        }
 
         ${
           project.soundtracks
